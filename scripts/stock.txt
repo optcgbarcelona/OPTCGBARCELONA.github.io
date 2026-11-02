@@ -24,7 +24,7 @@ Charlotte Linlin|OP17-099|OP17/904121|L|||0,02|23
 Charlotte Linlin|OP17-112#V.2|OP17/904137|AA|||15,00|2
 Charlotte Linlin|OP17-112|OP17/904136|SR|||2,00|7
 Charlotte Praline|EB05-053|EB05/919537|C|||0,02|28
-Charlotte Pudding|OP17-109|OP17/904133|R|||0,50|7
+Charlotte Pudding|OP17-109|OP17/904133|R|||0,50|3
 Crocodile & Mihawk|ST25-003|ST-25/829139|SR|||4,50|2
 Distorted Future|EB04-008|OP15/879513|R|||0,03|6
 Domino|EB05-025|EB05/918802|C|||0,02|28
