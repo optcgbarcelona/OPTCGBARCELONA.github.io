@@ -196,8 +196,8 @@ body :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border
 .shop-cm { background: var(--ink); color: var(--bg); }
 .shop-wa:hover, .shop-cm:hover { opacity: .9; }
 .shop-cmlist { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.shop-cmlist a { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--soft); text-decoration: none; padding: 8px 12px; border-radius: 10px; background: var(--surface); }
-.shop-cmlist a::after { content: "↗"; color: var(--muted); }
+.shop-cmlist li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--soft); padding: 8px 12px; border-radius: 10px; background: var(--surface); }
+.shop-cmhint { margin: 0 0 12px; font-size: 13px; color: var(--muted); }
 .shop-cmlist span { color: var(--muted); margin-left: auto; }
 .shop-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
 .shop-copy { background: transparent; color: var(--soft); height: 44px; }

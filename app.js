@@ -182,8 +182,9 @@
       "</section>" +
       '<section class="shop-opt" aria-labelledby="opt-cm">' +
         '<p class="shop-opt__tag">Opción 2</p><h4 id="opt-cm">Envío a casa con Cardmarket</h4>' +
-        "<p>Compra en mi tienda de Cardmarket. Pago protegido y envío con seguimiento a toda Europa.</p>" +
-        '<ul class="shop-cmlist">' + t.it.map(function (x) { return '<li><a href="' + cmName(x.c) + '" target="_blank" rel="noopener noreferrer">' + esc(x.c.n) + " <span>" + x.c.c + "</span></a></li>"; }).join("") + "</ul>" +
+        "<p>Compra en mi tienda de Cardmarket, usuario G11GAB. Pago protegido y envío con seguimiento a toda Europa.</p>" +
+        '<ul class="shop-cmlist">' + t.it.map(function (x) { return '<li>' + x.n + "× " + esc(x.c.n) + " <span>" + x.c.c + "</span></li>"; }).join("") + "</ul>" +
+        '<p class="shop-cmhint">Búscalas por nombre en mi tienda y añádelas a tu carrito de Cardmarket.</p>' +
         '<a class="shop-cm" href="' + SHOP.cardmarket + '/Offers/Singles" target="_blank" rel="noopener noreferrer">Ir a mi tienda en Cardmarket</a>' +
       "</section>" +
       '<div class="shop-actions"><button type="button" class="shop-copy" id="copy">Copiar el pedido</button><button type="button" class="shop-clear" id="clear">Vaciar pedido</button></div>' +
