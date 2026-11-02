@@ -61,6 +61,16 @@
     <div class="wall__track" id="wall"></div>
   </div>
 
+  <section class="sets" id="colecciones" aria-labelledby="sets-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="sets-title" class="sec-title"><span class="red-dash"></span>Singles por colección</h2>
+        <a class="sec-link" href="#catalogo">Ver todas →</a>
+      </header>
+      <div class="set-row" id="set-row"></div>
+    </div>
+  </section>
+
   <section class="band" id="buscadas" aria-labelledby="top-title">
     <div class="wrap">
       <header class="sec-head">
@@ -68,6 +78,16 @@
         <a class="sec-link" href="#catalogo">Ver todas →</a>
       </header>
       <ul class="shop-grid shop-grid--top" id="top-grid"></ul>
+    </div>
+  </section>
+
+  <section class="open" id="abre" aria-labelledby="open-title" hidden>
+    <div class="wrap open__inner">
+      <div class="open__kick" id="open-kick"></div>
+      <h2 class="open__title" id="open-title">Abre el sobre</h2>
+      <p class="open__hint" id="open-hint">Desliza el dedo por arriba o tócalo</p>
+      <div class="stage" id="stage" role="button" tabindex="0" aria-label="Abrir el sobre"></div>
+      <div class="open__cta"><button type="button" class="btn btn--w" id="open-go"></button><button type="button" class="btn btn--o" id="open-again">Cerrar el sobre</button></div>
     </div>
   </section>
 
@@ -80,23 +100,25 @@
         </div>
       </header>
       <div class="shop-bar">
-        <div class="shop-row">
+        <div class="cbar">
           <label class="shop-search"><span class="sr-only">Buscar</span>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-            <input id="q" type="search" placeholder="Busca una carta o un código" autocomplete="off">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="q" type="search" placeholder="Busca por nombre o código" autocomplete="off">
           </label>
-          <label class="shop-sort"><span class="sr-only">Ordenar</span>
+          <button type="button" class="cfbtn" id="fbtn" aria-expanded="false" aria-controls="fpanel">Filtros<b id="fcount" hidden>0</b></button>
+        </div>
+        <div class="ctabs-row">
+          <div class="ctabs" id="cats" role="group" aria-label="Tipo de carta"></div>
+          <label class="csort"><span>Ordenar</span>
             <select id="sort">
-              <option value="pd">Precio: mayor</option>
-              <option value="pa">Precio: menor</option>
-              <option value="na">Nombre A–Z</option>
+              <option value="pd">Precio ↓</option>
+              <option value="pa">Precio ↑</option>
+              <option value="na">A–Z</option>
               <option value="cd">Código</option>
             </select>
           </label>
         </div>
-        <div class="shop-scroller" id="cats" role="group" aria-label="Tipo de carta"></div>
-        <div class="shop-colors" id="colors" role="group" aria-label="Color"></div>
-        <div class="shop-scroller" id="sets" role="group" aria-label="Colección"></div>
+        <div class="cactive" id="active"></div>
       </div>
       <p class="shop-count" id="count"></p>
       <ul class="shop-grid" id="grid"></ul>
@@ -106,12 +128,17 @@
 
   <section class="how" id="como" aria-labelledby="how-title">
     <div class="wrap">
+      <div class="how__grid">
+      <div class="how__copy">
       <h2 id="how-title" class="big-title big-title--light">Cómo comprar</h2>
       <ol class="how__list">
         <li><span>01</span><strong>Elige</strong><p>Pulsa «Lo quiero» en las cartas que te interesen.</p></li>
         <li><span>02</span><strong>En mano</strong><p>Mándame el pedido por WhatsApp y quedamos en Barcelona. Pagas al recoger.</p></li>
         <li><span>03</span><strong>O a casa</strong><p>Cómpralas en mi tienda de Cardmarket, con pago protegido y envío con seguimiento.</p></li>
       </ol>
+      </div>
+      <figure class="how__video"><video src="assets/tutorial/como-comprar.mp4" poster="assets/tutorial/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Vídeo: cómo comprar en 3 pasos"></video></figure>
+      </div>
       <footer class="shop-foot" id="foot"></footer>
     </div>
   </section>
@@ -126,6 +153,14 @@
     <button type="button" class="shop-x" id="modal-x" aria-label="Cerrar">✕</button>
     <div id="modal-body"></div>
   </div>
+</div>
+
+<div class="fscrim" id="fscrim" hidden></div>
+<div class="fpanel" id="fpanel" hidden role="dialog" aria-modal="true" aria-label="Filtros">
+  <div class="fhead"><b>Filtros</b><button type="button" class="fx" id="fx" aria-label="Cerrar">✕</button></div>
+  <div class="fgroup"><p>Color</p><div class="fopts" id="colors"></div></div>
+  <div class="fgroup"><p>Colección</p><div class="fopts" id="sets"></div></div>
+  <div class="factions"><button type="button" class="cclear" id="freset">Borrar filtros</button><button type="button" class="cfbtn" id="fdone">Ver cartas</button></div>
 </div>
 
 <script src="app.js"></script>

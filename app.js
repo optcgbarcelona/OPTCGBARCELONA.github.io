@@ -59,17 +59,38 @@
   try { cart = JSON.parse(store.get("optcg-cart") || "{}") || {}; } catch (e) { cart = {}; }
 
   /* ---------------- catálogo ---------------- */
+  var DOT = { red: "#e0453c", green: "#22a25c", blue: "#2f7ae0", purple: "#9150cc", black: "#2b2f36", yellow: "#f0c22e" };
+  function setName(p) { var s = CARDS.filter(function (c) { return c.c.split("-")[0] === p; }); var n = {}; s.forEach(function (c) { n[c.set] = (n[c.set] || 0) + 1; }); return Object.keys(n).sort(function (a, b) { return n[b] - n[a]; })[0] || ""; }
+  var pend = null;
+  function countWith(p) { var a = state.color, b = state.set; state.color = p.color; state.set = p.set; var n = list().length; state.color = a; state.set = b; return n; }
   function chips() {
+    var sel = pend || state;
     $("cats").innerHTML = CATS.map(function (x) {
-      return '<button type="button" class="shop-tab" data-cat="' + x[0] + '" aria-pressed="' + (state.cat === x[0]) + '">' + x[1] + "<span>" + CARDS.filter(x[2]).length + "</span></button>";
+      return '<button type="button" class="ctab" data-cat="' + x[0] + '" aria-pressed="' + (state.cat === x[0]) + '">' + x[1] + "</button>";
     }).join("");
     $("colors").innerHTML = COLORS.filter(function (x) { return CARDS.some(function (c) { return c.col.indexOf(x[0]) >= 0; }); }).map(function (x) {
-      return '<button type="button" class="shop-color" data-color="' + x[0] + '" aria-pressed="' + (state.color === x[0]) + '">' + icon(x[0], 30) + "<span>" + x[1] + "</span></button>";
+      return '<button type="button" class="fopt" data-color="' + x[0] + '" style="--dot:' + DOT[x[0]] + '" aria-pressed="' + (sel.color === x[0]) + '"><i></i>' + x[1] + "</button>";
     }).join("");
-    var sets = []; CARDS.forEach(function (c) { if (sets.indexOf(c.set) < 0) sets.push(c.set); });
-    $("sets").innerHTML = sets.map(function (s) {
-      return '<button type="button" class="shop-set" data-set="' + esc(s) + '" aria-pressed="' + (state.set === s) + '">' + esc(s) + "</button>";
+    var pres = []; CARDS.forEach(function (c) { var p = c.c.split("-")[0]; if (pres.indexOf(p) < 0) pres.push(p); });
+    pres.sort(function (a, b) { var A = CARDS.filter(function (c) { return c.c.indexOf(a + "-") === 0; }).length, B = CARDS.filter(function (c) { return c.c.indexOf(b + "-") === 0; }).length; return B - A; });
+    $("sets").innerHTML = pres.map(function (p) {
+      return '<button type="button" class="fopt" data-set="' + p + '" title="' + esc(setName(p)) + '" aria-pressed="' + (sel.set === p) + '">' + p + "</button>";
     }).join("");
+    var act = [];
+    if (state.color) act.push('<button type="button" class="cchip" data-color="' + state.color + '">' + COLORS.filter(function (x) { return x[0] === state.color; })[0][1] + "<i>✕</i></button>");
+    if (state.set) act.push('<button type="button" class="cchip" data-set="' + state.set + '">' + state.set + " · " + esc(setName(state.set)) + "<i>✕</i></button>");
+    if (act.length > 1) act.push('<button type="button" class="cclear" id="freset2">Borrar todo</button>');
+    $("active").innerHTML = act.join("");
+    var n = (state.color ? 1 : 0) + (state.set ? 1 : 0);
+    $("fcount").hidden = !n; $("fcount").textContent = n;
+    if (pend) $("fdone").textContent = "Ver " + countWith(pend) + " cartas";
+  }
+  function panel(open, apply) {
+    if (open) pend = { color: state.color, set: state.set };
+    else { if (apply && pend) { state.color = pend.color; state.set = pend.set; render(); } pend = null; }
+    $("fpanel").hidden = !open; $("fscrim").hidden = !open; $("fbtn").setAttribute("aria-expanded", open);
+    document.documentElement.style.overflow = open ? "hidden" : "";
+    chips();
   }
 
   function qtyHtml(c) {
@@ -82,7 +103,7 @@
     var fn = CATS.filter(function (x) { return x[0] === state.cat; })[0][2];
     var s = state.q.trim().toLowerCase();
     var r = CARDS.filter(function (c) {
-      return fn(c) && (!state.color || c.col.indexOf(state.color) >= 0) && (!state.set || c.set === state.set) &&
+      return fn(c) && (!state.color || c.col.indexOf(state.color) >= 0) && (!state.set || c.c.indexOf(state.set + "-") === 0) &&
         (!s || (c.n + " " + c.c + " " + c.set).toLowerCase().indexOf(s) >= 0);
     });
     r.sort(function (a, b) {
@@ -105,7 +126,7 @@
       '<button type="button" class="shop-thumb" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n + " " + c.c) + '">' +
       tag(c) + '<span class="shop-rar">' + (RAR[c.r] || c.r) + "</span>" +
       '<img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '" loading="lazy" decoding="async" width="300" height="419"></button>' +
-      '<div class="shop-meta"><h3 class="shop-name">' + esc(c.n) + '</h3><p class="shop-sub">' + dots(c) + c.c + (c.v === 2 ? " · Alt art" : "") + " · " + esc(c.set) + "</p>" +
+      '<div class="shop-meta"><h3 class="shop-name">' + esc(c.n) + '</h3><p class="shop-sub">' + c.c + (c.v === 2 ? " · Alt art" : "") + "</p>" +
       '<div class="shop-buy"><p class="shop-price">' + eur(c.p) + "</p>" + qtyHtml(c) + "</div></div></li>";
   }
   function render() {
@@ -208,8 +229,15 @@
     var el = e.target.closest("button, a"); if (!el) return;
     var d = el.dataset;
     if (d.cat) { state.cat = d.cat; chips(); render(); }
+    else if (d.color && pend) { pend.color = pend.color === d.color ? "" : d.color; chips(); }
     else if (d.color) { state.color = state.color === d.color ? "" : d.color; chips(); render(); }
-    else if (d.set != null && el.classList.contains("shop-set")) { state.set = state.set === d.set ? "" : d.set; chips(); render(); }
+    else if (d.set != null && pend) { pend.set = pend.set === d.set ? "" : d.set; chips(); }
+    else if (d.set != null) { state.set = state.set === d.set ? "" : d.set; chips(); render(); }
+    else if (el.id === "fbtn") panel($("fpanel").hidden);
+    else if (el.id === "fdone") { panel(false, true); var ct = $("grid"); if (ct) window.scrollTo({ top: ct.getBoundingClientRect().top + scrollY - 260, behavior: "smooth" }); }
+    else if (el.id === "fx") panel(false);
+    else if (el.id === "freset" && pend) { pend.set = ""; pend.color = ""; chips(); }
+    else if (el.id === "freset2") { state.set = ""; state.color = ""; chips(); render(); }
     else if (d.add) { setQty(d.add, 1); bump(); }
     else if (d.inc) setQty(d.inc, (cart[d.inc] || 0) + 1);
     else if (d.dec) setQty(d.dec, (cart[d.dec] || 0) - 1);
@@ -226,12 +254,75 @@
     }
   });
   $("modal").addEventListener("click", function (e) { if (e.target === $("modal")) closeModal(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("modal").hidden) closeModal(); });
+  $("fscrim").addEventListener("click", function () { panel(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("modal").hidden) closeModal(); if (e.key === "Escape" && !$("fpanel").hidden) panel(false); });
   document.addEventListener("input", function (e) {
     if (e.target.id === "q") { state.q = e.target.value; render(); }
     if (e.target.id === "who") { store.set("optcg-buyer", e.target.value); var wa = $("wa"); if (wa) wa.href = "https://wa.me/" + SHOP.whatsapp + "?text=" + encodeURIComponent(message()); }
   });
   $("sort").addEventListener("change", function (e) { state.sort = e.target.value; render(); });
+
+  /* ---------------- colecciones + abre el sobre ---------------- */
+  var SETINFO = [
+    ["EB05", "Heroines Ed. Vol.2", "#ec4f9d", "eb05"],
+    ["OP17", "Strongest Warriors", "#f08a24", "op17"],
+    ["OP16", "The Time of Battle", "#3a1418", "op16"],
+    ["OP15", "Kami's Island", "#6a52a2", "op15"],
+    ["EB04", "Azure Sea's Seven", "#1f3d8f", "eb04"]
+  ];
+  function pre(c) { return c.c.split("-")[0]; }
+  function sets(byPrice) {
+    var html = SETINFO.map(function (s, i) {
+      var cs = byPrice.filter(function (c) { return pre(c) === s[0]; });
+      if (!cs.length) return "";
+      return '<button type="button" class="set-tile" data-pre="' + s[0] + '" style="--c:' + s[2] + ';--i:' + i + '" aria-label="Ver las ' + cs.length + ' cartas de ' + s[0] + '">' +
+        '<span class="set-head"><span class="set-code">' + s[0] + '</span><span class="set-sub"><i></i>SINGLES</span><span class="set-n">' + cs.length + " cartas · " + esc(s[1]) + "</span></span>" +
+        '<span class="set-go" aria-hidden="true">→</span>' +
+        '<span class="set-art" aria-hidden="true"><span class="set-card"><img src="' + cs[0].img + '" alt="" loading="lazy"></span>' +
+        '<span class="set-pack"><img src="assets/packs/pack-' + s[3] + '.webp" alt="" loading="lazy"></span></span></button>';
+    }).join("");
+    $("set-row").innerHTML = html;
+    var row = $("set-row");
+    if ("IntersectionObserver" in window) { var o = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { row.classList.add("in"); o.disconnect(); } }); }, { threshold: .35 }); o.observe(row); }
+    else row.classList.add("in");
+  }
+  function packOpen(byPrice) {
+    var s = SETINFO[1], cs = byPrice.filter(function (c) { return pre(c) === s[0]; });
+    if (cs.length < 3) return;
+    var pos = [["-64%", "-58%", "-14deg", ".05s"], ["64%", "-58%", "14deg", ".15s"], ["0%", "-74%", "0deg", ".25s"]];
+    var pick = [cs[1], cs[2], cs[0]];
+    $("stage").innerHTML = pick.map(function (c, i) {
+      return '<div class="cardout" style="--x:' + pos[i][0] + ";--y:" + pos[i][1] + ";--r:" + pos[i][2] + ";--d:" + pos[i][3] + '"><img src="' + c.img + '" alt="' + esc(c.n) + '"></div>';
+    }).join("") + '<div class="pk pk--body"><img src="assets/packs/pack-' + s[3] + '.webp" alt="Sobre ' + s[0] + '"></div><div class="pk pk--top"><img src="assets/packs/pack-' + s[3] + '.webp" alt=""></div><div class="cut"></div><div class="finger"></div>';
+    $("open-kick").textContent = "OP-17 · The World's Strongest Warriors";
+    $("open-go").textContent = "Ver las " + cs.length + " cartas de OP-17 →";
+    $("open-go").setAttribute("data-pre", "OP17");
+    $("abre").hidden = false;
+    var stage = $("stage"), down = null, moved = false;
+    function setT(t) { stage.style.setProperty("--t", t); }
+    function doOpen() { if (stage.classList.contains("is-open")) return; setT(1); stage.classList.remove("is-cutting"); stage.classList.add("is-open"); $("open-hint").textContent = "¡Ya está! Estas son de verdad, y están a la venta."; }
+    stage.addEventListener("pointerdown", function (e) { if (stage.classList.contains("is-open")) return; down = { x: e.clientX, y: e.clientY }; moved = false; });
+    stage.addEventListener("pointermove", function (e) {
+      if (!down) return;
+      var dx = e.clientX - down.x, dy = e.clientY - down.y;
+      if (!moved && Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 8) { down = null; return; }
+      if (Math.abs(dx) > 6) {
+        if (!moved) { moved = true; try { stage.setPointerCapture(e.pointerId); } catch (x) {} }
+        var r = stage.getBoundingClientRect(), t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+        stage.classList.add("is-cutting"); setT(t); if (t > .9) { down = null; doOpen(); }
+      }
+    });
+    stage.addEventListener("pointerup", function () { if (!down) return; down = null; if (!moved) doOpen(); else if (!stage.classList.contains("is-open")) { setT(0); stage.classList.remove("is-cutting"); } });
+    stage.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doOpen(); } });
+    $("open-again").addEventListener("click", function () { stage.classList.remove("is-open"); setT(0); $("open-hint").textContent = "Desliza el dedo por arriba o tócalo"; });
+  }
+  function filterPre(p) {
+    state.q = ""; state.cat = "all"; state.set = p; state.color = "";
+    var q = $("q"); if (q) q.value = "";
+    chips(); render();
+    var cat = $("catalogo"); if (cat) cat.scrollIntoView({ behavior: "smooth" });
+  }
+  document.addEventListener("click", function (e) { var el = e.target.closest("[data-pre]"); if (el) filterPre(el.getAttribute("data-pre")); });
 
   /* ---------------- movimiento ---------------- */
   var SEEN = {};
@@ -299,6 +390,7 @@
     $("hero-stats").innerHTML = '<span><b>' + CARDS.length + "</b> cartas</span><span><b>" + CARDS.filter(isAlt).length + "</b> alt art</span><span><b>" + last + "</b> últimas unidades</span>";
     $("top-grid").innerHTML = byPrice.slice(0, 4).map(tile).join("");
     motion(byPrice, last);
+    sets(byPrice); packOpen(byPrice);
     $("lede").textContent = CARDS.length + " cartas · " + copies.toLocaleString("es-ES") + " copias. Inglés y Near Mint.";
     $("updated").textContent = "Actualizado: " + UPDATED;
     $("foot").innerHTML = "Precios en euros, actualizados el " + esc(UPDATED) + ". Todas en inglés y Near Mint. También en <a href=\"" + SHOP.cardmarket + "\" target=\"_blank\" rel=\"noopener noreferrer\">Cardmarket</a> (G11GAB).";
