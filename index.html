@@ -40,7 +40,7 @@
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero__copy">
       <p class="hero__crumb">One Piece Card Game <span>/</span> Barcelona</p>
-      <h1 id="hero-title" class="hero__title">Nuevo<br>drop</h1>
+      <h1 id="hero-title" class="hero__title"><span class="ln"><span>Nuevo</span></span><span class="ln"><span>drop</span></span></h1>
       <p class="hero__lede">Las cartas más buscadas, en inglés y Near Mint. Cuando se acaban, se acaban.</p>
       <p class="hero__live"><i></i><span id="updated">Actualizado hoy</span></p>
       <div class="hero__stats" id="hero-stats"></div>
@@ -51,6 +51,15 @@
     </div>
     <div class="hero__fan" id="hero-fan" aria-label="Cartas destacadas"></div>
   </section>
+
+  <div class="xband" aria-hidden="true">
+    <div class="ticker ticker--black"><div class="ticker__track" id="ticker-b"></div></div>
+    <div class="ticker ticker--red"><div class="ticker__track" id="ticker-a"></div></div>
+  </div>
+
+  <div class="wall" aria-label="Algunas cartas del drop">
+    <div class="wall__track" id="wall"></div>
+  </div>
 
   <section class="band" id="buscadas" aria-labelledby="top-title">
     <div class="wrap">

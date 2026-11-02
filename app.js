@@ -115,6 +115,7 @@
     $("grid").innerHTML = r.map(tile).join("");
     if (CARDS.length) $("top-grid").innerHTML = CARDS.slice().sort(function (a, b) { return b.p - a.p; }).slice(0, 4).map(tile).join("");
     updateDock();
+    reveal();
   }
 
   /* ---------------- pedido ---------------- */
@@ -209,7 +210,7 @@
     if (d.cat) { state.cat = d.cat; chips(); render(); }
     else if (d.color) { state.color = state.color === d.color ? "" : d.color; chips(); render(); }
     else if (d.set != null && el.classList.contains("shop-set")) { state.set = state.set === d.set ? "" : d.set; chips(); render(); }
-    else if (d.add) setQty(d.add, 1);
+    else if (d.add) { setQty(d.add, 1); bump(); }
     else if (d.inc) setQty(d.inc, (cart[d.inc] || 0) + 1);
     else if (d.dec) setQty(d.dec, (cart[d.dec] || 0) - 1);
     else if (d.zoom) openZoom(d.zoom);
@@ -232,6 +233,58 @@
   });
   $("sort").addEventListener("change", function (e) { state.sort = e.target.value; render(); });
 
+  /* ---------------- movimiento ---------------- */
+  var SEEN = {};
+  var STAR = '<b class="star">✦</b>';
+  function loop(html, times) { var out = ""; for (var i = 0; i < times; i++) out += html; return out; }
+  function motion(byPrice, last) {
+    var sets = [];
+    CARDS.forEach(function (c) { var k = (c.c.split("-")[0] || "").replace(/^([A-Z]+)(\d+)$/, "$1-$2"); if (k && sets.indexOf(k) < 0) sets.push(k); });
+    sets.sort();
+    var a = ["Nuevo drop", CARDS.length + " cartas", last + " últimas unidades", "Recogida en mano en Barcelona", "Envío con Cardmarket", "Inglés · Near Mint", sets.slice(-5).join(" · ")];
+    var ta = "<span>" + a.map(esc).join(STAR) + STAR + "</span>";
+    $("ticker-a").innerHTML = loop(ta, 4);
+    var b = byPrice.slice(0, 10).map(function (c) { return esc(c.n) + " <em>" + eur(c.p) + "</em>"; });
+    var tb = "<span>" + b.join(STAR) + STAR + "</span>";
+    $("ticker-b").innerHTML = loop(tb, 4);
+    var wall = byPrice.slice(0, 18).map(function (c, i) {
+      return '<button type="button" class="wall-card" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n) + '" style="--r:' + ((i % 5) - 2) * 1.6 + 'deg"><img src="' + c.img + '" alt="" loading="lazy" decoding="async" width="300" height="419"></button>';
+    }).join("");
+    $("wall").innerHTML = wall + wall.replace(/<button /g, '<button tabindex="-1" aria-hidden="true" ');
+  }
+
+  var io = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { var t = e.target; t.classList.add("in"); setTimeout(function () { t.style.removeProperty("--d"); }, 900); SEEN[e.target.getAttribute("data-k")] = 1; io.unobserve(e.target); } });
+  }, { rootMargin: "0px 0px -8% 0px" }) : null;
+  function reveal() {
+    var els = document.querySelectorAll(".shop-card:not(.in)");
+    for (var i = 0; i < els.length; i++) {
+      var z = els[i].querySelector("[data-zoom]"), k = z ? z.getAttribute("data-zoom") : "";
+      els[i].setAttribute("data-k", k);
+      if (SEEN[k]) { els[i].classList.add("in"); continue; }
+      els[i].style.setProperty("--d", (i % 4) * 70 + "ms");
+      if (io) io.observe(els[i]); else els[i].classList.add("in");
+    }
+  }
+
+  (function tilt() {
+    var hero = document.querySelector(".hero"), fan = $("hero-fan");
+    if (!hero || !fan || !window.matchMedia("(hover: hover)").matches) return;
+    var raf = 0;
+    hero.addEventListener("pointermove", function (e) {
+      var r = fan.getBoundingClientRect();
+      var x = (e.clientX - (r.left + r.width / 2)) / r.width, y = (e.clientY - (r.top + r.height / 2)) / r.height;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function () { fan.style.setProperty("--mx", x.toFixed(3)); fan.style.setProperty("--my", y.toFixed(3)); });
+    });
+    hero.addEventListener("pointerleave", function () { fan.style.setProperty("--mx", 0); fan.style.setProperty("--my", 0); });
+  })();
+
+  function bump() {
+    var d = $("dock"); if (!d) return;
+    d.classList.remove("bump"); void d.offsetWidth; d.classList.add("bump");
+  }
+
   /* ---------------- datos ---------------- */
   fetch("stock.json?v=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (data) {
     UPDATED = data.updated;
@@ -241,10 +294,11 @@
     var byPrice = CARDS.slice().sort(function (a, b) { return b.p - a.p; });
     var last = CARDS.filter(function (c) { return c.q === 1; }).length;
     $("hero-fan").innerHTML = [byPrice[2], byPrice[0], byPrice[1]].map(function (c, i) {
-      return '<button type="button" class="fan-card fan-card--' + i + '" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n) + '"><img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '"></button>';
+      return '<button type="button" class="fan-card fan-card--' + i + '" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n) + '"><span class="fan-float"><img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '"><i class="holo"></i></span></button>';
     }).join("") + '<span class="hero-stamp">' + last + "<small>últimas<br>unidades</small></span>";
     $("hero-stats").innerHTML = '<span><b>' + CARDS.length + "</b> cartas</span><span><b>" + CARDS.filter(isAlt).length + "</b> alt art</span><span><b>" + last + "</b> últimas unidades</span>";
     $("top-grid").innerHTML = byPrice.slice(0, 4).map(tile).join("");
+    motion(byPrice, last);
     $("lede").textContent = CARDS.length + " cartas · " + copies.toLocaleString("es-ES") + " copias. Inglés y Near Mint.";
     $("updated").textContent = "Actualizado: " + UPDATED;
     $("foot").innerHTML = "Precios en euros, actualizados el " + esc(UPDATED) + ". Todas en inglés y Near Mint. También en <a href=\"" + SHOP.cardmarket + "\" target=\"_blank\" rel=\"noopener noreferrer\">Cardmarket</a> (G11GAB).";
