@@ -286,3 +286,7 @@ body :focus-visible { outline: 3px solid var(--g-sun); outline-offset: 2px; }
 .shop-dock__n { font: 600 14px var(--f-body); border-radius: 999px; }
 .shop-bar { border-radius: 24px; border: 0; background: rgba(10,31,58,.82); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); }
 .shop-search input, .shop-sort select { border-radius: 14px; border-color: transparent; background: rgba(234,242,247,.08); }
+
+.shop-wa { background: #25d366; color: #052e16; box-shadow: 0 10px 26px rgba(37,211,102,.35); }
+.shop-wa:hover { filter: brightness(1.05); }
+.shop-copy { background: rgba(234,242,247,.1); color: var(--g-foam); }

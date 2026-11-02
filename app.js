@@ -5,7 +5,7 @@
 
   var SHOP = {
     // Número de WhatsApp con prefijo, sin "+" ni espacios (ej. 34600111222).
-    whatsapp: "",
+    whatsapp: "34603420373",
     cardmarket: "https://www.cardmarket.com/en/OnePiece/Users/G11GAB"
   };
 
@@ -165,7 +165,7 @@
     var t = totals();
     if (!t.n) { closeModal(); return; }
     var who = store.get("optcg-buyer") || "";
-    var wa = SHOP.whatsapp ? '<a class="shop-wa" id="wa" target="_blank" rel="noopener noreferrer" href="https://wa.me/' + SHOP.whatsapp + "?text=" + encodeURIComponent(message()) + '">Enviar por WhatsApp</a>' : "";
+    var wa = SHOP.whatsapp ? '<a class="shop-wa" id="wa" target="_blank" rel="noopener noreferrer" href="https://wa.me/' + SHOP.whatsapp + "?text=" + encodeURIComponent(message()) + '"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1Z"/></svg>Pedir por WhatsApp</a>' : "";
     showModal("order", '<div class="shop-order"><h2 class="shop-order__title">Tu pedido.</h2><ul class="shop-lines">' +
       t.it.map(function (x) {
         return '<li><img src="' + x.c.img + '" alt="" width="44" height="61"><div><strong>' + esc(x.c.n) + "</strong><span>" + x.c.c + " · " + eur(x.c.p) + " c/u</span></div>" +
@@ -173,9 +173,9 @@
       }).join("") + "</ul>" +
       '<p class="shop-sum"><span>' + t.n + (t.n === 1 ? " carta" : " cartas") + "</span><b>" + eur(t.t) + "</b></p>" +
       '<label class="shop-field" for="who">Tu nombre (opcional)</label><input id="who" class="shop-input" value="' + esc(who) + '" placeholder="Para saber de quién es el pedido">' +
-      '<div class="shop-actions">' + wa + '<button type="button" class="shop-copy" id="copy">Copiar mensaje del pedido</button><button type="button" class="shop-clear" id="clear">Vaciar pedido</button></div>' +
+      '<div class="shop-actions">' + wa + '<button type="button" class="shop-copy" id="copy">Copiar el pedido</button><button type="button" class="shop-clear" id="clear">Vaciar pedido</button></div>' +
       '<pre class="shop-msg" id="msg" hidden></pre>' +
-      '<p class="shop-note">' + (SHOP.whatsapp ? "Se abre WhatsApp con el pedido ya escrito. Solo tienes que enviarlo." : "Copia el mensaje y pégalo en el chat de WhatsApp donde te pasé este enlace.") + "</p></div>", "Tu pedido");
+      '<p class="shop-note">' + (SHOP.whatsapp ? "Se abre WhatsApp con tu pedido ya escrito. Solo tienes que darle a enviar." : "Copia el mensaje y pégalo en el chat de WhatsApp donde te pasé este enlace.") + "</p></div>", "Tu pedido");
   }
   function toast(t) {
     var e = document.createElement("div"); e.className = "shop-toast"; e.setAttribute("role", "status"); e.textContent = t;
