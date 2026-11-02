@@ -47,7 +47,7 @@
   var keyOf = function (c) { return c.c + "#" + c.v; };
   var CATS = [
     ["all", "Todas", function () { return true; }],
-    ["hot", "Destacadas", isHot],
+    ["hot", "Más buscadas", isHot],
     ["alt", "Arte alternativo", isAlt],
     ["lead", "Líderes", function (c) { return c.t === "Leader"; }],
     ["deck", "Para el mazo", function (c) { return c.p < 1 && c.t !== "Leader"; }]
@@ -74,7 +74,7 @@
 
   function qtyHtml(c) {
     var n = cart[keyOf(c)] || 0;
-    if (!n) return '<button type="button" class="shop-add" data-add="' + esc(keyOf(c)) + '" aria-label="Añadir ' + esc(c.n) + '"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>';
+    if (!n) return '<button type="button" class="shop-add" data-add="' + esc(keyOf(c)) + '" aria-label="Añadir ' + esc(c.n) + ' al pedido">Lo quiero</button>';
     return '<div class="shop-step"><button type="button" data-dec="' + esc(keyOf(c)) + '" aria-label="Quitar una">−</button><span>' + n + '</span><button type="button" data-inc="' + esc(keyOf(c)) + '" aria-label="Añadir una"' + (n >= c.q ? " disabled" : "") + ">+</button></div>";
   }
 
@@ -94,18 +94,26 @@
     return r;
   }
 
+  function tag(c) {
+    if (c.q === 1) return '<span class="tag tag--red">Última unidad</span>';
+    if (c.q <= 3) return '<span class="tag tag--red">Quedan ' + c.q + "</span>";
+    if (c.r === "SP" || c.r === "SEC" || c.r === "MR" || c.r === "TR") return '<span class="tag">' + (RARN[c.r] || c.r) + "</span>";
+    return "";
+  }
+  function tile(c) {
+    return '<li class="shop-card"' + (isHot(c) ? " data-hot" : "") + ">" +
+      '<button type="button" class="shop-thumb" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n + " " + c.c) + '">' +
+      tag(c) + '<span class="shop-rar">' + (RAR[c.r] || c.r) + "</span>" +
+      '<img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '" loading="lazy" decoding="async" width="300" height="419"></button>' +
+      '<div class="shop-meta"><h3 class="shop-name">' + esc(c.n) + '</h3><p class="shop-sub">' + dots(c) + c.c + (c.v === 2 ? " · Alt art" : "") + " · " + esc(c.set) + "</p>" +
+      '<div class="shop-buy"><p class="shop-price">' + eur(c.p) + "</p>" + qtyHtml(c) + "</div></div></li>";
+  }
   function render() {
     var r = list();
     $("count").textContent = r.length + (r.length === 1 ? " carta" : " cartas");
     $("empty").hidden = r.length > 0;
-    $("grid").innerHTML = r.map(function (c) {
-      return '<li class="shop-card"' + (isHot(c) ? " data-hot" : "") + ">" +
-        '<button type="button" class="shop-thumb" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n + " " + c.c) + '">' +
-        '<img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '" loading="lazy" decoding="async" width="300" height="419">' +
-        '<span class="shop-rar">' + (RAR[c.r] || c.r) + "</span></button>" +
-        '<div class="shop-meta"><h3 class="shop-name">' + esc(c.n) + '</h3><p class="shop-sub">' + dots(c) + c.c + (c.v === 2 ? " · alt" : "") + "</p>" +
-        '<div class="shop-buy"><p class="shop-price">' + eur(c.p) + "<small>" + c.q + (c.q === 1 ? " disponible" : " disponibles") + "</small></p>" + qtyHtml(c) + "</div></div></li>";
-    }).join("");
+    $("grid").innerHTML = r.map(tile).join("");
+    if (CARDS.length) $("top-grid").innerHTML = CARDS.slice().sort(function (a, b) { return b.p - a.p; }).slice(0, 4).map(tile).join("");
     updateDock();
   }
 
@@ -230,46 +238,17 @@
     CARDS = data.cards.filter(function (c) { return c.q > 0; });
     CARDS.forEach(function (c) { BYKEY[keyOf(c)] = c; });
     var copies = CARDS.reduce(function (a, c) { return a + c.q; }, 0);
-    $("lede").textContent = CARDS.length + " cartas. " + copies.toLocaleString("es-ES") + " copias. Toca una para verla de cerca.";
-    $("count-title").textContent = CARDS.length + " cartas";
-    var sets = []; CARDS.forEach(function (c) { var s = c.c.split("-")[0]; if (sets.indexOf(s) < 0 && /^(OP|EB)/.test(s)) sets.push(s); });
-    $("set-tags").innerHTML = sets.sort().slice(-5).map(function (s) { return "<li>" + s + "</li>"; }).join("");
-    $("foot").innerHTML = "Precios en euros, actualizados el " + esc(UPDATED) + ". Todas en inglés y Near Mint. También en <a href=\"" + SHOP.cardmarket + "\" target=\"_blank\" rel=\"noopener noreferrer\">Cardmarket</a>.";
+    var byPrice = CARDS.slice().sort(function (a, b) { return b.p - a.p; });
+    var last = CARDS.filter(function (c) { return c.q === 1; }).length;
+    $("hero-fan").innerHTML = [byPrice[2], byPrice[0], byPrice[1]].map(function (c, i) {
+      return '<button type="button" class="fan-card fan-card--' + i + '" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n) + '"><img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '"></button>';
+    }).join("") + '<span class="hero-stamp">' + last + "<small>últimas<br>unidades</small></span>";
+    $("hero-stats").innerHTML = '<span><b>' + CARDS.length + "</b> cartas</span><span><b>" + CARDS.filter(isAlt).length + "</b> alt art</span><span><b>" + last + "</b> últimas unidades</span>";
+    $("top-grid").innerHTML = byPrice.slice(0, 4).map(tile).join("");
+    $("lede").textContent = CARDS.length + " cartas · " + copies.toLocaleString("es-ES") + " copias. Inglés y Near Mint.";
+    $("updated").textContent = "Actualizado: " + UPDATED;
+    $("foot").innerHTML = "Precios en euros, actualizados el " + esc(UPDATED) + ". Todas en inglés y Near Mint. También en <a href=\"" + SHOP.cardmarket + "\" target=\"_blank\" rel=\"noopener noreferrer\">Cardmarket</a> (G11GAB).";
     chips(); render();
   }).catch(function () { $("lede").textContent = "No se han podido cargar las cartas. Recarga la página."; });
 
-  /* ---------------- película con scroll ---------------- */
-  var journey = $("journey"), film = $("film"), bar = $("jbar");
-  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var target = 0, current = 0, ready = false, ticking = false;
-  function progress() {
-    var r = journey.getBoundingClientRect(), total = journey.offsetHeight - window.innerHeight;
-    return total > 0 ? Math.min(1, Math.max(0, -r.top / total)) : 0;
-  }
-  function onScroll() {
-    var p = progress(); bar.style.setProperty("--p", p.toFixed(4));
-    var chapters = ["c1", "c2", "c3"], idx = Math.min(2, Math.floor(p * 3));
-    document.querySelectorAll(".journey__dots a").forEach(function (a, i) { a.setAttribute("aria-current", i === idx ? "true" : "false"); });
-    if (ready) { target = p * (film.duration - 0.05); if (!ticking) { ticking = true; requestAnimationFrame(tick); } }
-  }
-  function tick() {
-    current += (target - current) * 0.18;
-    if (Math.abs(target - current) < 0.01) current = target;
-    if (Math.abs(film.currentTime - current) > 1 / 60) { try { film.currentTime = current; } catch (e) { /* busy */ } }
-    if (current !== target) requestAnimationFrame(tick); else ticking = false;
-  }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
-  onScroll();
-  if (!reduce) {
-    var mobile = window.matchMedia("(max-width: 860px)").matches;
-    var src = mobile ? "assets/film/film-mobile.mp4" : "assets/film/film.mp4";
-    fetch(src).then(function (r) { if (!r.ok) throw new Error(r.status); return r.blob(); }).then(function (b) {
-      film.src = URL.createObjectURL(b);
-      film.addEventListener("loadeddata", function () {
-        ready = true; var pp = film.play(); if (pp && pp.then) pp.then(function () { film.pause(); onScroll(); }, function () {}); else film.pause(); film.classList.add("is-ready"); onScroll();
-      }, { once: true });
-      film.load();
-    }).catch(function () { /* se queda el póster */ });
-  }
 })();
