@@ -129,11 +129,17 @@
       '<div class="shop-meta"><h3 class="shop-name">' + esc(c.n) + '</h3><p class="shop-sub">' + c.c + (c.v === 2 ? " · Alt art" : "") + "</p>" +
       '<div class="shop-buy"><p class="shop-price">' + eur(c.p) + "</p>" + qtyHtml(c) + "</div></div></li>";
   }
+  var PREVIEW = 10, expanded = false;
   function render() {
     var r = list();
     $("count").textContent = r.length + (r.length === 1 ? " carta" : " cartas");
     $("empty").hidden = r.length > 0;
-    $("grid").innerHTML = r.map(tile).join("");
+    var limit = (expanded || state.q.trim()) ? r.length : PREVIEW;
+    $("grid").innerHTML = r.slice(0, limit).map(tile).join("");
+    var more = r.length > limit;
+    $("more").hidden = !more && !(expanded && r.length > PREVIEW);
+    $("grid").classList.toggle("is-cut", more);
+    $("more-btn").innerHTML = more ? "Ver las " + r.length + " cartas <span>↓</span>" : "Mostrar menos <span>↑</span>";
     if (CARDS.length) $("top-grid").innerHTML = CARDS.slice().sort(function (a, b) { return b.p - a.p; }).slice(0, 4).map(tile).join("");
     updateDock();
     reveal();
@@ -228,7 +234,7 @@
   document.addEventListener("click", function (e) {
     var el = e.target.closest("button, a"); if (!el) return;
     var d = el.dataset;
-    if (d.cat) { state.cat = d.cat; chips(); render(); }
+    if (d.cat) { state.cat = d.cat; expanded = false; chips(); render(); }
     else if (d.color && pend) { pend.color = pend.color === d.color ? "" : d.color; chips(); }
     else if (d.color) { state.color = state.color === d.color ? "" : d.color; chips(); render(); }
     else if (d.set != null && pend) { pend.set = pend.set === d.set ? "" : d.set; chips(); }
@@ -236,6 +242,7 @@
     else if (el.id === "fbtn") panel($("fpanel").hidden);
     else if (el.id === "fdone") { panel(false, true); var ct = $("grid"); if (ct) window.scrollTo({ top: ct.getBoundingClientRect().top + scrollY - 260, behavior: "smooth" }); }
     else if (el.id === "fx") panel(false);
+    else if (el.id === "more-btn") { var wasOpen = expanded; expanded = !expanded; render(); if (wasOpen) { var g = $("catalogo"); if (g) g.scrollIntoView({ behavior: "smooth" }); } }
     else if (el.id === "freset" && pend) { pend.set = ""; pend.color = ""; chips(); }
     else if (el.id === "freset2") { state.set = ""; state.color = ""; chips(); render(); }
     else if (d.add) { setQty(d.add, 1); bump(); }

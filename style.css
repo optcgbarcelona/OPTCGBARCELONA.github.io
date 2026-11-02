@@ -302,6 +302,16 @@ body :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 .shop-toast { position: fixed; left: 50%; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 70; background: var(--ink); color: var(--white); padding: 10px 18px; border-radius: 999px; font: 700 14px var(--f); }
 
 
+/* ---------- ver todas ---------- */
+.shop-grid.is-cut { position:relative; }
+.shop-grid.is-cut::after { content:""; position:absolute; left:-20px; right:-20px; bottom:-2px; height:160px; background:linear-gradient(180deg, rgba(235,234,230,0), var(--bg) 85%); pointer-events:none; }
+.more { position:relative; z-index:2; display:flex; justify-content:center; margin-top:-70px; padding-bottom:10px; }
+.shop-grid:not(.is-cut) + .more { margin-top:28px; }
+.more-btn { display:inline-flex; align-items:center; gap:12px; height:58px; padding:0 30px; border:0; border-radius:999px; background:var(--ink); color:#fff; font:700 17px var(--f); cursor:pointer; box-shadow:0 18px 34px -16px rgba(0,0,0,.45); transition:transform .2s, background .2s; }
+.more-btn:hover { background:var(--red); transform:translateY(-2px); }
+.more-btn span { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.16); font-size:15px; }
+.shop { padding-bottom:70px; }
+
 /* ---------- cómo comprar: vídeo ---------- */
 .how__grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,480px); gap:48px; align-items:center; }
 .how__grid .how__list { grid-template-columns:1fr; gap:22px; }
