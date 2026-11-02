@@ -138,7 +138,7 @@
     var lines = t.it.slice().sort(function (a, b) { return b.c.p - a.c.p; }).map(function (x) {
       return "• " + x.n + "× " + x.c.n + " (" + x.c.c + (x.c.v === 2 ? " alt" : "") + ") - " + eur(x.c.p * x.n);
     });
-    return "¡Hola! " + (who ? "Soy " + who + ". " : "") + "Me interesan estas cartas de OPTCG Barcelona:\n" + lines.join("\n") +
+    return "¡Hola! " + (who ? "Soy " + who + ". " : "") + "Quiero estas cartas de OPTCG Barcelona para recogerlas en mano en Barcelona:\n" + lines.join("\n") +
       "\n\nTotal: " + eur(t.t) + " (" + t.n + (t.n === 1 ? " carta" : " cartas") + ")\n¿Están disponibles?";
   }
 
@@ -161,21 +161,33 @@
       '<p class="shop-sub">' + esc(c.set) + " · Inglés · Near Mint · " + c.q + (c.q === 1 ? " disponible" : " disponibles") + "</p>" +
       '<div class="shop-buy"><p class="shop-price shop-price--big">' + eur(c.p) + "</p>" + qtyHtml(c) + "</div></div></div>", c.n);
   }
+  var WA_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1Z"/></svg>';
+  var cmName = function (c) { return SHOP.cardmarket + "/Offers/Singles?name=" + encodeURIComponent(c.n); };
   function openOrder() {
     var t = totals();
     if (!t.n) { closeModal(); return; }
     var who = store.get("optcg-buyer") || "";
-    var wa = SHOP.whatsapp ? '<a class="shop-wa" id="wa" target="_blank" rel="noopener noreferrer" href="https://wa.me/' + SHOP.whatsapp + "?text=" + encodeURIComponent(message()) + '"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1Z"/></svg>Pedir por WhatsApp</a>' : "";
     showModal("order", '<div class="shop-order"><h2 class="shop-order__title">Tu pedido.</h2><ul class="shop-lines">' +
       t.it.map(function (x) {
         return '<li><img src="' + x.c.img + '" alt="" width="44" height="61"><div><strong>' + esc(x.c.n) + "</strong><span>" + x.c.c + " · " + eur(x.c.p) + " c/u</span></div>" +
           '<div class="shop-lines__r"><b>' + eur(x.c.p * x.n) + "</b>" + qtyHtml(x.c) + "</div></li>";
       }).join("") + "</ul>" +
       '<p class="shop-sum"><span>' + t.n + (t.n === 1 ? " carta" : " cartas") + "</span><b>" + eur(t.t) + "</b></p>" +
-      '<label class="shop-field" for="who">Tu nombre (opcional)</label><input id="who" class="shop-input" value="' + esc(who) + '" placeholder="Para saber de quién es el pedido">' +
-      '<div class="shop-actions">' + wa + '<button type="button" class="shop-copy" id="copy">Copiar el pedido</button><button type="button" class="shop-clear" id="clear">Vaciar pedido</button></div>' +
-      '<pre class="shop-msg" id="msg" hidden></pre>' +
-      '<p class="shop-note">' + (SHOP.whatsapp ? "Se abre WhatsApp con tu pedido ya escrito. Solo tienes que darle a enviar." : "Copia el mensaje y pégalo en el chat de WhatsApp donde te pasé este enlace.") + "</p></div>", "Tu pedido");
+      '<h3 class="shop-choose">¿Cómo lo quieres?</h3>' +
+      '<section class="shop-opt" aria-labelledby="opt-hand">' +
+        '<p class="shop-opt__tag">Opción 1</p><h4 id="opt-hand">Recogida en mano en Barcelona</h4>' +
+        "<p>Me mandas el pedido por WhatsApp y quedamos en Barcelona. Pagas al recoger.</p>" +
+        '<label class="shop-field" for="who">Tu nombre (opcional)</label><input id="who" class="shop-input" value="' + esc(who) + '" placeholder="Para saber de quién es el pedido">' +
+        '<a class="shop-wa" id="wa" target="_blank" rel="noopener noreferrer" href="https://wa.me/' + SHOP.whatsapp + "?text=" + encodeURIComponent(message()) + '">' + WA_ICON + "Pedir por WhatsApp</a>" +
+      "</section>" +
+      '<section class="shop-opt" aria-labelledby="opt-cm">' +
+        '<p class="shop-opt__tag">Opción 2</p><h4 id="opt-cm">Envío a casa con Cardmarket</h4>' +
+        "<p>Compra en mi tienda de Cardmarket. Pago protegido y envío con seguimiento a toda Europa.</p>" +
+        '<ul class="shop-cmlist">' + t.it.map(function (x) { return '<li><a href="' + cmName(x.c) + '" target="_blank" rel="noopener noreferrer">' + esc(x.c.n) + " <span>" + x.c.c + "</span></a></li>"; }).join("") + "</ul>" +
+        '<a class="shop-cm" href="' + SHOP.cardmarket + '/Offers/Singles" target="_blank" rel="noopener noreferrer">Ir a mi tienda en Cardmarket</a>' +
+      "</section>" +
+      '<div class="shop-actions"><button type="button" class="shop-copy" id="copy">Copiar el pedido</button><button type="button" class="shop-clear" id="clear">Vaciar pedido</button></div>' +
+      '<pre class="shop-msg" id="msg" hidden></pre></div>', "Tu pedido");
   }
   function toast(t) {
     var e = document.createElement("div"); e.className = "shop-toast"; e.setAttribute("role", "status"); e.textContent = t;
