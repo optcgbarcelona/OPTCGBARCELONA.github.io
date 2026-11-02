@@ -47,10 +47,10 @@
   var keyOf = function (c) { return c.c + "#" + c.v; };
   var CATS = [
     ["all", "Todas", function () { return true; }],
-    ["hot", "Joyas del cofre", isHot],
+    ["hot", "Destacadas", isHot],
     ["alt", "Arte alternativo", isAlt],
     ["lead", "Líderes", function (c) { return c.t === "Leader"; }],
-    ["deck", "Para tu mazo", function (c) { return c.p < 1 && c.t !== "Leader"; }]
+    ["deck", "Para el mazo", function (c) { return c.p < 1 && c.t !== "Leader"; }]
   ];
 
   var CARDS = [], BYKEY = {}, UPDATED = "";
@@ -104,7 +104,7 @@
         '<img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '" loading="lazy" decoding="async" width="300" height="419">' +
         '<span class="shop-rar">' + (RAR[c.r] || c.r) + "</span></button>" +
         '<div class="shop-meta"><h3 class="shop-name">' + esc(c.n) + '</h3><p class="shop-sub">' + dots(c) + c.c + (c.v === 2 ? " · alt" : "") + "</p>" +
-        '<div class="shop-buy"><p class="shop-price">' + eur(c.p) + "<small>" + c.q + " disp.</small></p>" + qtyHtml(c) + "</div></div></li>";
+        '<div class="shop-buy"><p class="shop-price">' + eur(c.p) + "<small>" + c.q + (c.q === 1 ? " disponible" : " disponibles") + "</small></p>" + qtyHtml(c) + "</div></div></li>";
     }).join("");
     updateDock();
   }
@@ -158,7 +158,7 @@
     showModal("zoom", '<div class="shop-zoom"><img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '"><div>' +
       '<h3 class="shop-zoom__name">' + esc(c.n) + "</h3>" +
       '<p class="shop-sub">' + dots(c) + c.c + (c.v === 2 ? " · arte alternativo" : "") + " · " + (RARN[c.r] || c.r) + " · " + (TYPES[c.t] || c.t) + "</p>" +
-      '<p class="shop-sub">' + esc(c.set) + " · Inglés · Near Mint · " + c.q + " disponibles</p>" +
+      '<p class="shop-sub">' + esc(c.set) + " · Inglés · Near Mint · " + c.q + (c.q === 1 ? " disponible" : " disponibles") + "</p>" +
       '<div class="shop-buy"><p class="shop-price shop-price--big">' + eur(c.p) + "</p>" + qtyHtml(c) + "</div></div></div>", c.n);
   }
   function openOrder() {
@@ -166,7 +166,7 @@
     if (!t.n) { closeModal(); return; }
     var who = store.get("optcg-buyer") || "";
     var wa = SHOP.whatsapp ? '<a class="shop-wa" id="wa" target="_blank" rel="noopener noreferrer" href="https://wa.me/' + SHOP.whatsapp + "?text=" + encodeURIComponent(message()) + '">Enviar por WhatsApp</a>' : "";
-    showModal("order", '<div class="shop-order"><h2 class="shop-order__title">Tu pedido</h2><ul class="shop-lines">' +
+    showModal("order", '<div class="shop-order"><h2 class="shop-order__title">Tu pedido.</h2><ul class="shop-lines">' +
       t.it.map(function (x) {
         return '<li><img src="' + x.c.img + '" alt="" width="44" height="61"><div><strong>' + esc(x.c.n) + "</strong><span>" + x.c.c + " · " + eur(x.c.p) + " c/u</span></div>" +
           '<div class="shop-lines__r"><b>' + eur(x.c.p * x.n) + "</b>" + qtyHtml(x.c) + "</div></li>";
@@ -217,11 +217,11 @@
     CARDS = data.cards.filter(function (c) { return c.q > 0; });
     CARDS.forEach(function (c) { BYKEY[keyOf(c)] = c; });
     var copies = CARDS.reduce(function (a, c) { return a + c.q; }, 0);
-    $("lede").textContent = CARDS.length + " cartas distintas y " + copies.toLocaleString("es-ES") + " copias. Toca una carta para verla en grande y pulsa + para añadirla a tu pedido.";
+    $("lede").textContent = CARDS.length + " cartas. " + copies.toLocaleString("es-ES") + " copias. Toca una para verla de cerca.";
     $("count-title").textContent = CARDS.length + " cartas";
     var sets = []; CARDS.forEach(function (c) { var s = c.c.split("-")[0]; if (sets.indexOf(s) < 0 && /^(OP|EB)/.test(s)) sets.push(s); });
     $("set-tags").innerHTML = sets.sort().slice(-5).map(function (s) { return "<li>" + s + "</li>"; }).join("");
-    $("foot").innerHTML = "Precios en euros, actualizados el " + esc(UPDATED) + ". Todas las cartas en inglés y Near Mint. También vendo en <a href=\"" + SHOP.cardmarket + "\" target=\"_blank\" rel=\"noopener noreferrer\">Cardmarket</a>.";
+    $("foot").innerHTML = "Precios en euros, actualizados el " + esc(UPDATED) + ". Todas en inglés y Near Mint. También en <a href=\"" + SHOP.cardmarket + "\" target=\"_blank\" rel=\"noopener noreferrer\">Cardmarket</a>.";
     chips(); render();
   }).catch(function () { $("lede").textContent = "No se han podido cargar las cartas. Recarga la página."; });
 
