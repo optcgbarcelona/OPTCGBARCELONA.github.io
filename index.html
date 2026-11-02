@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OPTCG Barcelona · Cartas One Piece</title>
+<meta name="description" content="Cartas sueltas de One Piece Card Game en inglés y Near Mint. Elige tus cartas y pide por WhatsApp. Entrega en Barcelona o envío por Correos.">
+<meta property="og:title" content="OPTCG Barcelona · Cartas One Piece">
+<meta property="og:description" content="Cartas sueltas de One Piece Card Game en inglés y Near Mint. Pide por WhatsApp. Entrega en Barcelona o envío por Correos.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://optcgbarcelona.github.io/">
+<meta property="og:image" content="https://optcgbarcelona.github.io/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#071629">
+<link rel="icon" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top-nav">
+  <a class="top-brand" href="#top" aria-label="OPTCG Barcelona, inicio">
+    <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 5.5 19 16l-3 10.5L13 16Z" fill="currentColor"/><circle cx="16" cy="16" r="2" fill="currentColor"/></svg>
+    <span>OPTCG <b>BCN</b></span>
+  </a>
+  <span class="top-nav__spacer"></span>
+  <a class="top-navlink" href="#catalogo">Ver cartas</a>
+  <a class="top-navbag" href="#pedido" id="navbag" hidden aria-label="Ver mi pedido">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+    <span id="navbag-n">0</span>
+  </a>
+</header>
+
+<main id="top">
+  <section class="journey" id="journey" aria-label="Bienvenida">
+    <div class="journey__stage" aria-hidden="true">
+      <picture>
+        <source media="(max-width: 860px)" srcset="assets/film/poster-mobile.jpg">
+        <img src="assets/film/poster.jpg" alt="" fetchpriority="high">
+      </picture>
+      <video id="film" muted playsinline preload="none" disablepictureinpicture></video>
+      <div class="journey__shade"></div>
+      <div class="journey__bar"><span id="jbar"></span></div>
+    </div>
+    <nav class="journey__dots" aria-label="Capítulos">
+      <a href="#c1" aria-label="A bordo"></a><a href="#c2" aria-label="El barco"></a><a href="#c3" aria-label="El cofre"></a>
+    </nav>
+
+    <article class="chapter" id="c1">
+      <div class="chapter__copy">
+        <p class="chapter__kicker">One Piece Card Game · Barcelona</p>
+        <h1 class="chapter__title">OPTCG Barcelona</h1>
+        <p class="chapter__body">Cartas sueltas de One Piece Card Game, en inglés y Near Mint, directamente de mi colección en Barcelona.</p>
+        <ul class="chapter__tags"><li>Inglés</li><li>Near Mint</li><li>Envío o en mano</li></ul>
+        <p class="scroll-hint">Desliza para abrir el cofre ↓</p>
+      </div>
+    </article>
+    <article class="chapter" id="c2" data-align="right">
+      <div class="chapter__copy">
+        <p class="chapter__kicker">Del sobre a la funda</p>
+        <h2 class="chapter__title">Cada carta, revisada a mano</h2>
+        <p class="chapter__body">Líderes, alternativas, SP y todo lo que te falta para cerrar el mazo. Los precios se actualizan solos varias veces al día.</p>
+        <ul class="chapter__tags" id="set-tags"></ul>
+      </div>
+    </article>
+    <article class="chapter" id="c3">
+      <div class="chapter__copy">
+        <p class="chapter__kicker">Tu botín</p>
+        <h2 class="chapter__title"><span id="count-title">Cartas</span> esperando tripulación</h2>
+        <p class="chapter__body">Elige tus cartas, mándame el pedido por WhatsApp y quedamos en Barcelona o te lo envío por Correos.</p>
+        <div class="chapter__cta"><a class="top-cta" href="#catalogo">Abrir el cofre</a></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="shop" id="catalogo" aria-labelledby="shop-title">
+    <div class="shop-wave" aria-hidden="true"></div>
+    <div class="shop-wrap">
+      <header class="shop-head">
+        <p class="shop-eyebrow">El catálogo</p>
+        <h2 id="shop-title" class="shop-title">Elige tu botín</h2>
+        <p class="shop-lede" id="lede">Cargando las cartas…</p>
+      </header>
+      <div class="shop-bar">
+        <div class="shop-row">
+          <label class="shop-search"><span class="sr-only">Buscar</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="q" type="search" placeholder="Nombre o código, ej. Shanks u OP17-022" autocomplete="off">
+          </label>
+          <label class="shop-sort"><span class="sr-only">Ordenar</span>
+            <select id="sort">
+              <option value="pd">Precio: mayor</option>
+              <option value="pa">Precio: menor</option>
+              <option value="na">Nombre A–Z</option>
+              <option value="cd">Código</option>
+            </select>
+          </label>
+        </div>
+        <div class="shop-scroller" id="cats" role="group" aria-label="Tipo de carta"></div>
+        <div class="shop-colors" id="colors" role="group" aria-label="Color"></div>
+        <div class="shop-scroller" id="sets" role="group" aria-label="Colección"></div>
+      </div>
+      <p class="shop-count" id="count"></p>
+      <ul class="shop-grid" id="grid"></ul>
+      <p class="shop-empty" id="empty" hidden>Ninguna carta coincide. Prueba con otro nombre o quita un filtro.</p>
+
+      <ol class="shop-how" aria-label="Cómo comprar">
+        <li><strong>Elige</strong><span>Pulsa + en las cartas que quieras y ajusta la cantidad.</span></li>
+        <li><strong>Envía el pedido</strong><span>Abre tu pedido y mándamelo por WhatsApp. Te confirmo disponibilidad enseguida.</span></li>
+        <li><strong>Pago y entrega</strong><span>Quedamos en mano en Barcelona o te lo envío por Correos con seguimiento.</span></li>
+      </ol>
+      <footer class="shop-foot" id="foot"></footer>
+    </div>
+  </section>
+</main>
+
+<div class="shop-dock" id="dock" hidden>
+  <button type="button" id="dock-btn"><span class="shop-dock__n" id="dock-n">0</span><span>Ver mi pedido</span><span class="shop-dock__t" id="dock-t">0,00 €</span></button>
+</div>
+
+<div class="shop-modal" id="modal" hidden role="dialog" aria-modal="true">
+  <div class="shop-modal__panel" id="panel">
+    <button type="button" class="shop-x" id="modal-x" aria-label="Cerrar">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
