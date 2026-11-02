@@ -161,7 +161,7 @@
     if (n) cart[key] = n; else delete cart[key];
     store.set("optcg-cart", JSON.stringify(cart));
     render();
-    if (!$("modal").hidden) { if (modalKind === "order") openOrder(); else if (modalKind === "zoom") openZoom(zoomKey); }
+    if (!$("modal").hidden) { if (modalKind === "order") openOrder(); else if (modalKind === "zoom") openZoom(zoomKey); else if (modalKind === "news") openNews(newsOpen); }
   }
   function updateDock() {
     var t = totals();
@@ -331,6 +331,51 @@
   }
   document.addEventListener("click", function (e) { var el = e.target.closest("[data-pre]"); if (el) filterPre(el.getAttribute("data-pre")); });
 
+  /* ---------------- news (secundaria) ---------------- */
+  var NEWS = null;
+  function byCode(code) { var best = null; CARDS.forEach(function (c) { if (c.c === code && (!best || c.p > best.p)) best = c; }); return best; }
+  function newsCard(it, i) {
+    var k = "nc nc--" + (it.kind || "meta"), inner = '<span class="nk"><span>' + esc(it.label || "") + "</span><span>" + esc(it.date || "") + "</span></span>";
+    if (it.big) inner += '<span class="nbig">' + esc(it.big) + "</span>";
+    if (it.img && !it.rows) inner += '<img class="nimg" src="' + it.img + '" alt="" loading="lazy">';
+    inner += '<span class="nt">' + esc(it.title) + "</span>";
+    if (it.rows) inner += '<span class="nrows">' + it.rows.map(function (r) { return '<span class="nrow ' + r[0] + '"><i>' + (r[0] === "up" ? "↑" : "↓") + "</i>" + esc(r[1]) + "<em>" + esc(r[2] || "—") + "</em></span>"; }).join("") + "</span>";
+    else if (it.summary) inner += '<span class="ns">' + esc(it.summary) + "</span>";
+    var foot = "";
+    if (it.stats) foot += '<span class="nstat">' + it.stats.map(function (s) { return "<span><b>" + esc(s[0]) + "</b><small>" + esc(s[1]) + "</small></span>"; }).join("") + "</span>";
+    if (it.video) foot += '<span class="nplay" aria-hidden="true"></span>';
+    else if (it.body) foot += '<span class="nmore">Leer →</span>';
+    if (foot) inner += '<span class="nfoot">' + foot + "</span>";
+    var tag = it.body || (it.cards && it.cards.length) ? 'button type="button" data-news="' + esc(it.id) + '"' : "div";
+    return "<" + tag + ' class="' + k + '" style="--i:' + i + '">' + inner + "</" + tag.split(" ")[0] + ">";
+  }
+  function renderNews() {
+    if (!NEWS || !NEWS.items || !NEWS.items.length) return;
+    $("ngrid").innerHTML = NEWS.items.slice(0, 4).map(newsCard).join("");
+    if (NEWS.updated) $("news-upd").textContent = "Actualizado: " + NEWS.updated;
+    var cal = NEWS.calendar;
+    if (cal && cal.dates) { $("ncal").innerHTML = "<b>" + esc(cal.title) + "</b><ol>" + cal.dates.map(function (d) { return '<li class="' + (d[2] ? "hot" : "") + '"><span>' + esc(d[0]) + "</span>" + esc(d[1]) + "</li>"; }).join("") + "</ol>"; $("ncal").hidden = false; }
+    $("news").hidden = false;
+    var sec = $("news");
+    if ("IntersectionObserver" in window) { var o = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { sec.classList.add("in"); o.disconnect(); } }); }, { threshold: .15 }); o.observe(sec); } else sec.classList.add("in");
+  }
+  var newsOpen = "";
+  function openNews(id) {
+    var it = (NEWS && NEWS.items || []).filter(function (x) { return x.id === id; })[0]; if (!it) return;
+    newsOpen = id;
+    var kc = { meta: "var(--red)", torneos: "var(--ink)", guia: "#ec4f9d", coleccion: "#1f3d8f" }[it.kind] || "var(--red)";
+    var body = (it.body || []).map(function (b) { return (b.h ? "<h4>" + esc(b.h) + "</h4>" : "") + (b.p ? "<p>" + esc(b.p) + "</p>" : "") + (b.li ? "<ul>" + b.li.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("") + "</ul>" : ""); }).join("");
+    if (!body && it.summary) body = "<p>" + esc(it.summary) + "</p>";
+    var cs = (it.cards || []).map(byCode).filter(Boolean);
+    var shop = cs.length ? '<div class="nread__shop"><h5>Cartas de esta ' + (it.video ? "guía" : "noticia") + " que tengo a la venta</h5>" + cs.map(function (c) {
+      return '<div class="nread__card"><img src="' + c.img + '" alt="' + esc(c.n) + '" data-zoom="' + esc(keyOf(c)) + '"><div><b>' + esc(c.n) + "</b><small>" + c.c + " · " + eur(c.p) + "</small></div>" + qtyHtml(c) + "</div>";
+    }).join("") + "</div>" : "";
+    var src = it.sources && it.sources.length ? '<p class="nread__src">Fuentes: ' + it.sources.map(esc).join(" · ") + "</p>" : "";
+    showModal("news", '<div class="nread"><div class="nread__hero" style="--k:' + kc + '"><span class="nk"><span>' + esc(it.label || "") + "</span><span>" + esc(it.date || "") + "</span></span><h3>" + esc(it.title) + "</h3>" + (it.img ? '<img src="' + it.img + '" alt="">' : "") + '</div><div class="nread__body">' + body + shop + src + "</div></div>", it.title);
+  }
+  document.addEventListener("click", function (e) { var el = e.target.closest("[data-news]"); if (el) openNews(el.getAttribute("data-news")); });
+  fetch("news.json?v=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { NEWS = d; if (CARDS.length) renderNews(); }).catch(function () {});
+
   /* ---------------- movimiento ---------------- */
   var SEEN = {};
   var STAR = '<b class="star">✦</b>';
@@ -397,7 +442,7 @@
     $("hero-stats").innerHTML = '<span><b>' + CARDS.length + "</b> cartas</span><span><b>" + CARDS.filter(isAlt).length + "</b> alt art</span><span><b>" + last + "</b> últimas unidades</span>";
     $("top-grid").innerHTML = byPrice.slice(0, 4).map(tile).join("");
     motion(byPrice, last);
-    sets(byPrice); packOpen(byPrice);
+    sets(byPrice); packOpen(byPrice); renderNews();
     $("lede").textContent = CARDS.length + " cartas · " + copies.toLocaleString("es-ES") + " copias. Inglés y Near Mint.";
     $("updated").textContent = "Actualizado: " + UPDATED;
     $("foot").innerHTML = "Precios en euros, actualizados el " + esc(UPDATED) + ". Todas en inglés y Near Mint. También en <a href=\"" + SHOP.cardmarket + "\" target=\"_blank\" rel=\"noopener noreferrer\">Cardmarket</a> (G11GAB).";

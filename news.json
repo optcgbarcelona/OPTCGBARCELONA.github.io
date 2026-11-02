@@ -1,0 +1,60 @@
+{
+  "updated": "2 de noviembre de 2026",
+  "items": [
+    {
+      "id": "luffy-rg-japon",
+      "kind": "meta",
+      "label": "Meta · Japón",
+      "date": "2 nov",
+      "title": "Luffy rojo-verde arrasa en Japón",
+      "summary": "Gana 8 de los 17 torneos de tienda del fin de semana con EB-05.",
+      "img": "assets/news/OP13-001.webp",
+      "stats": [["8/17", "torneos JP"], ["10,1%", "meta online"]],
+      "body": [
+        { "p": "Luffy rojo-verde (OP13-001) gana 8 de los 17 torneos de tienda japoneses del fin de semana con EB-05. Ningún otro líder pasa de 2: es el que más te vas a encontrar en las próximas semanas." },
+        { "h": "Su plan", "li": ["Defenderse: en tu turno gira DON!! para dar +2000 al líder o a un Straw Hat.", "Busca con Nami y Bonney, recupera DON!! y cierra con Zoro EB04-007."] },
+        { "h": "Cómo ganarle", "li": ["Ataca varias veces por turno, primero con los Character pequeños: cada DON!! que gira para defender ya no está para el siguiente ataque.", "Quita a Nami en cuanto puedas."] }
+      ],
+      "cards": ["EB04-007", "OP13-118"],
+      "sources": ["onepiecetopdecks.com", "chinoizecupstats.com", "en.onepiece-cardgame.com"]
+    },
+    {
+      "id": "eb05-legal",
+      "kind": "torneos",
+      "label": "Torneos",
+      "date": "Viernes",
+      "big": "06 NOV",
+      "title": "EB-05 ya es legal",
+      "summary": "Empieza la Heroines Battle Vol.2 en tiendas y se abren las inscripciones del 4th Anniversary de OP-18.",
+      "body": [
+        { "p": "El viernes 6 de noviembre EB-05 pasa a ser legal en torneos en inglés." },
+        { "h": "Ese mismo día", "li": ["Empieza la Heroines Battle Vol.2 en las tiendas.", "Se abren en TCG+ las inscripciones al 4th Anniversary Event de OP-18 (del 20/11 al 17/12, con la promo P-161 Luffy)."] }
+      ],
+      "cards": [],
+      "sources": ["en.onepiece-cardgame.com"]
+    },
+    {
+      "id": "robin-guia",
+      "kind": "guia",
+      "label": "Guía de líder · Vídeo",
+      "date": "Muy pronto",
+      "title": "Aprende un líder: Nico Robin EB05-010",
+      "summary": "Cómo funciona, las cartas clave y los errores típicos. En español.",
+      "img": "assets/news/EB05-010.webp",
+      "video": true,
+      "cards": ["EB05-010"]
+    },
+    {
+      "id": "sube-baja",
+      "kind": "meta",
+      "label": "Meta EN · Semana",
+      "date": "",
+      "title": "Quién sube y quién baja",
+      "rows": [["up", "Luffy rojo-verde", "10,1%"], ["up", "Enel amarillo", "57,8%"], ["up", "Buggy azul", "7,2%"], ["down", "Robin negra", ""], ["down", "Hancock OP14", "48,8%"]]
+    }
+  ],
+  "calendar": {
+    "title": "Camino a Elche",
+    "dates": [["7-8", "Porto", true], ["14-15", "Bordeaux", false], ["21-22", "Bristol", false], ["28-29", "Elche / Alicante", false]]
+  }
+}
