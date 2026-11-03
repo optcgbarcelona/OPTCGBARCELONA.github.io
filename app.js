@@ -59,6 +59,21 @@
   try { cart = JSON.parse(store.get("optcg-cart") || "{}") || {}; } catch (e) { cart = {}; }
 
   /* ---------------- catálogo ---------------- */
+  function hexIcon(cols, size) {
+    var s = size || 22, A = DOT[cols[0]] || "#999", B = DOT[cols[1] || cols[0]] || A;
+    function hex(r) { var p = []; for (var i = 0; i < 6; i++) { var a = Math.PI / 180 * (60 * i - 90); p.push((20 + r * Math.cos(a)).toFixed(2) + "," + (23 + r * Math.sin(a)).toFixed(2)); } return p; }
+    var O = hex(21), I = hex(16.5), C = hex(4.2), tri = "", lines = "";
+    var shades = ["rgba(255,255,255,.22)", "rgba(255,255,255,.04)", "rgba(0,0,0,.16)", "rgba(0,0,0,.30)", "rgba(0,0,0,.14)", "rgba(255,255,255,.10)"];
+    for (var i = 0; i < 6; i++) { tri += '<polygon points="20,23 ' + I[i] + " " + I[(i + 1) % 6] + '" fill="' + shades[i] + '"/>'; lines += '<line x1="20" y1="23" x2="' + I[i].split(",")[0] + '" y2="' + I[i].split(",")[1] + '"/>'; }
+    var id = "h" + Math.random().toString(36).slice(2, 7);
+    return '<svg class="hexic" width="' + s + '" height="' + Math.round(s * 46 / 40) + '" viewBox="0 0 40 46" aria-hidden="true"><defs><clipPath id="' + id + '"><polygon points="' + O.join(" ") + '"/></clipPath></defs>' +
+      '<g clip-path="url(#' + id + ')"><rect x="0" y="0" width="20" height="46" fill="' + A + '"/><rect x="20" y="0" width="20" height="46" fill="' + B + '"/>' +
+      '<polygon points="' + O.join(" ") + '" fill="rgba(255,255,255,.04)"/>' + tri +
+      '<g stroke="rgba(0,0,0,.38)" stroke-width="1.4">' + lines + "</g>" +
+      '<polygon points="' + I.join(" ") + '" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.6"/>' +
+      '<polygon points="' + C.join(" ") + '" fill="' + A + '" stroke="rgba(0,0,0,.45)" stroke-width="1.4"/></g>' +
+      '<polygon points="' + O.join(" ") + '" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="1.8"/></svg>';
+  }
   var DOT = { red: "#e0453c", green: "#22a25c", blue: "#2f7ae0", purple: "#9150cc", black: "#2b2f36", yellow: "#f0c22e" };
   function setName(p) { var s = CARDS.filter(function (c) { return c.c.split("-")[0] === p; }); var n = {}; s.forEach(function (c) { n[c.set] = (n[c.set] || 0) + 1; }); return Object.keys(n).sort(function (a, b) { return n[b] - n[a]; })[0] || ""; }
   var pend = null;
@@ -69,7 +84,7 @@
       return '<button type="button" class="ctab" data-cat="' + x[0] + '" aria-pressed="' + (state.cat === x[0]) + '">' + x[1] + "</button>";
     }).join("");
     $("colors").innerHTML = COLORS.filter(function (x) { return CARDS.some(function (c) { return c.col.indexOf(x[0]) >= 0; }); }).map(function (x) {
-      return '<button type="button" class="fopt" data-color="' + x[0] + '" style="--dot:' + DOT[x[0]] + '" aria-pressed="' + (sel.color === x[0]) + '"><i></i>' + x[1] + "</button>";
+      return '<button type="button" class="fopt" data-color="' + x[0] + '" style="--dot:' + DOT[x[0]] + '" aria-pressed="' + (sel.color === x[0]) + '">' + hexIcon([x[0]], 24) + x[1] + "</button>";
     }).join("");
     var pres = []; CARDS.forEach(function (c) { var p = c.c.split("-")[0]; if (pres.indexOf(p) < 0) pres.push(p); });
     pres.sort(function (a, b) { var A = CARDS.filter(function (c) { return c.c.indexOf(a + "-") === 0; }).length, B = CARDS.filter(function (c) { return c.c.indexOf(b + "-") === 0; }).length; return B - A; });
@@ -160,7 +175,7 @@
     n = Math.max(0, Math.min(c.q, n));
     if (n) cart[key] = n; else delete cart[key];
     store.set("optcg-cart", JSON.stringify(cart));
-    render(); checkGift();
+    render(); checkGift(); if ($("hq-res") && !$("hq-res").hidden) hqRender();
     if (!$("modal").hidden) { if (modalKind === "order") openOrder(); else if (modalKind === "zoom") openZoom(zoomKey); else if (modalKind === "news") openNews(newsOpen); }
   }
   function updateDock() {
@@ -427,6 +442,34 @@
   }
   document.addEventListener("click", function (e) { var el = e.target.closest("[data-news]"); if (el) openNews(el.getAttribute("data-news")); });
   fetch("news.json?v=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { NEWS = d; if (CARDS.length) renderNews(); }).catch(function () {});
+
+  /* ---------------- buscador de arriba ---------------- */
+  function hqMatches(s) {
+    s = s.trim().toLowerCase(); if (!s) return [];
+    return CARDS.filter(function (c) { return (c.n + " " + c.c + " " + c.set).toLowerCase().indexOf(s) >= 0; }).sort(function (a, b) { return b.p - a.p; });
+  }
+  function hqRender() {
+    var v = $("hq").value, r = hqMatches(v), box = $("hq-res");
+    if (!v.trim()) { box.hidden = true; return; }
+    box.innerHTML = r.length ? r.slice(0, 5).map(function (c) {
+      return '<div class="hqr"><img src="' + c.img + '" alt="" data-zoom="' + esc(keyOf(c)) + '"><div class="hqr__t"><b>' + esc(c.n) + "</b><small>" + c.c + (c.v === 2 ? " · Alt art" : "") + "</small></div><span class=\"hqr__p\">" + eur(c.p) + "</span>" + qtyHtml(c) + "</div>";
+    }).join("") + '<button type="button" class="hqr__all" id="hq-all">Ver ' + (r.length === 1 ? "el resultado" : "los " + r.length + " resultados") + " en el catálogo →</button>"
+      : '<p class="hqr__none">Ninguna carta con «' + esc(v) + '». Prueba con otro nombre o código.</p>';
+    box.hidden = false;
+  }
+  function hqGo() {
+    var v = $("hq").value; state.q = v; state.cat = "all"; state.set = ""; state.color = "";
+    var q = $("q"); if (q) q.value = v; chips(); render(); $("hq-res").hidden = true;
+    var g = $("catalogo"); if (g) g.scrollIntoView({ behavior: "smooth" });
+  }
+  $("hq").addEventListener("input", hqRender);
+  $("hq").addEventListener("focus", hqRender);
+  $("hq").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); hqGo(); } if (e.key === "Escape") $("hq-res").hidden = true; });
+  document.addEventListener("click", function (e) {
+    if (e.target.closest && e.target.closest("#hq-all")) { hqGo(); return; }
+    if (!e.target.isConnected) return;
+    if (!e.target.closest(".tsearch")) $("hq-res").hidden = true;
+  });
 
   /* ---------------- movimiento ---------------- */
   var SEEN = {};

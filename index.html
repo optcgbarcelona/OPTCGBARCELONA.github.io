@@ -38,6 +38,16 @@
 </header>
 
 <main id="top">
+  <div class="tsearch">
+    <div class="tsearch__in">
+      <label class="tsearch__box"><span class="tsearch__ic" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.5-4.5"/></svg></span>
+        <span class="sr-only">Buscar una carta</span>
+        <input id="hq" type="search" placeholder="Busca tu carta: Luffy, Shanks, OP17-037…" autocomplete="off" enterkeyhint="search">
+      </label>
+      <div class="tsearch__res" id="hq-res" hidden></div>
+    </div>
+  </div>
+
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero__copy">
       <p class="hero__crumb">One Piece Card Game <span>/</span> Barcelona</p>
@@ -53,19 +63,14 @@
     <div class="hero__fan" id="hero-fan" aria-label="Cartas destacadas"></div>
   </section>
 
-  <section class="how" id="como" aria-labelledby="how-title">
-    <div class="wrap">
-      <div class="how__grid">
-      <div class="how__copy">
-      <h2 id="how-title" class="big-title big-title--light">Cómo comprar</h2>
-      <ol class="how__list">
-        <li><span>01</span><strong>Elige</strong><p>Pulsa «Lo quiero» en las cartas que te interesen.</p></li>
-        <li><span>02</span><strong>En mano</strong><p>Mándame el pedido por WhatsApp y quedamos en Barcelona. Pagas al recoger.</p></li>
-        <li><span>03</span><strong>O a casa</strong><p>Cómpralas en mi tienda de Cardmarket, con pago protegido y envío con seguimiento.</p></li>
-      </ol>
-      </div>
+  <section class="howvid" id="video" aria-labelledby="vid-title">
+    <div class="wrap howvid__in">
+      <header class="howvid__head">
+        <h2 id="vid-title" class="sec-title"><span class="red-dash"></span>Cómo comprar</h2>
+        <p>En 30 segundos. Sin registrarte.</p>
+        <a class="sec-link" href="#como">Los 3 pasos →</a>
+      </header>
       <figure class="how__video"><video src="assets/tutorial/como-comprar.mp4" poster="assets/tutorial/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Vídeo: cómo comprar en 3 pasos"></video></figure>
-      </div>
     </div>
   </section>
 
@@ -151,6 +156,16 @@
       </header>
       <div class="ngrid" id="ngrid"></div>
       <div class="ncal" id="ncal" hidden></div>
+    </div>
+  </section>
+  <section class="how" id="como" aria-labelledby="how-title">
+    <div class="wrap">
+      <h2 id="how-title" class="big-title big-title--light">Cómo comprar</h2>
+      <ol class="how__list how__list--row">
+        <li><span>01</span><strong>Elige</strong><p>Pulsa «Lo quiero» en las cartas que te interesen.</p></li>
+        <li><span>02</span><strong>En mano</strong><p>Mándame el pedido por WhatsApp y quedamos en Barcelona. Pagas al recoger. A partir de 30 € te regalo fundas y a partir de 50 € una carta sorpresa.</p></li>
+        <li><span>03</span><strong>O a casa</strong><p>Cómpralas en mi tienda de Cardmarket, con pago protegido y envío con seguimiento.</p></li>
+      </ol>
     </div>
   </section>
   <div class="wrap"><footer class="shop-foot shop-foot--end" id="foot"></footer></div>
