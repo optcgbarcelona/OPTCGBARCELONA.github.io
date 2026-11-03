@@ -158,3 +158,21 @@
 .theme-black .shop-modal__panel:has(.pz) { max-width:820px; width:min(820px,100%); }
 .pz > * { min-width:0; }
 .theme-black .shop-x { background:#262626; color:#fff; }
+
+/* ===== negro: contraste en ventanas, ticket y botones ===== */
+.theme-black .tkt { background:#0b0b0b; color:#fff; }
+.theme-black .tkt__paper { --ink:#0b0b0b; --muted:#6d6b66; --red:#e1251b; background:#fff; color:#0b0b0b; }
+.theme-black .tkt__btn, .theme-black .btn--w { background:#fff; color:#0b0b0b; }
+.theme-black .shop-opt { background:#1d1d1d; color:#fff; }
+.theme-black .shop-input { background:#0b0b0b; color:#fff; }
+.theme-black .shop-cm, .theme-black .hqr__all, .theme-black .nplay { background:#e1251b; color:#fff; }
+.theme-black .nplay::before { border-left-color:#fff; }
+.theme-black .shop-msg, .theme-black .nread__shop { background:#1d1d1d; color:#fff; }
+.theme-black .nread__card { background:#0b0b0b; }
+.theme-black .cchip, .theme-black .fopt[aria-pressed="true"], .theme-black .shop-toast, .theme-black .tag:not(.tag--red) { background:#fff; color:#0b0b0b; border-color:#fff; }
+.theme-black .ncal li span { background:#fff; color:#0b0b0b; }
+.theme-black .ncal li.hot span { background:#e1251b; color:#fff; }
+.theme-black .gift__face--b { background:#fff; box-shadow:inset 0 0 0 2px #0b0b0b; }
+.theme-black .gift__face--b i { color:#0b0b0b; }
+.theme-black .gift__track { background:#262626; box-shadow:inset 0 0 0 2px #fff; }
+.theme-black .shop-lines li { border-color:#262626; }
