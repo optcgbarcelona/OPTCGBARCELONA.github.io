@@ -160,22 +160,45 @@
     n = Math.max(0, Math.min(c.q, n));
     if (n) cart[key] = n; else delete cart[key];
     store.set("optcg-cart", JSON.stringify(cart));
-    render();
+    render(); checkGift();
     if (!$("modal").hidden) { if (modalKind === "order") openOrder(); else if (modalKind === "zoom") openZoom(zoomKey); else if (modalKind === "news") openNews(newsOpen); }
   }
   function updateDock() {
     var t = totals();
     $("dock").hidden = !t.n || !$("modal").hidden;
     $("dock-n").textContent = t.n; $("dock-t").textContent = eur(t.t);
+    var dg = $("dock-gift"); if (dg) dg.innerHTML = giftHTML(t.t, true);
     $("navbag").hidden = !t.n; $("navbag-n").textContent = t.n;
   }
+  /* ---------------- carta sorpresa (regalo) ---------------- */
+  var GIFT_AT = 50, wasGift = false;
+  var ORDER = String(1000 + Math.floor(Math.random() * 9000));
+  function giftHTML(t, small) {
+    var pct = Math.min(100, Math.round(t / GIFT_AT * 100)), full = t >= GIFT_AT;
+    var left = full ? "¡Carta sorpresa desbloqueada!" : "Te faltan " + eur(GIFT_AT - t) + " para tu carta sorpresa";
+    return '<span class="gift' + (full ? " full" : "") + (small ? " gift--sm" : "") + '"><span class="gift__row"><span class="gift__track"><span class="gift__fill" style="width:' + pct + '%"></span></span>' +
+      '<span class="gift__card" aria-hidden="true"><span class="gift__face gift__face--b"><b style="height:' + pct + '%"></b><i>?</i></span><span class="gift__face gift__face--f">★</span></span></span>' +
+      (small ? "" : '<span class="gift__txt"><span>' + left + "</span><b>" + (full ? "★ ¡Es tuya!" : eur(t).replace(" €", "") + " / " + GIFT_AT + " €") + "</b></span>") + "</span>";
+  }
+  function confetti() {
+    var box = document.createElement("div"); box.className = "confetti"; box.setAttribute("aria-hidden", "true");
+    var cols = ["#e1251b", "#0b0b0b", "#ffffff", "#e1251b", "#d6d4ce"], html = "";
+    for (var i = 0; i < 70; i++) html += '<i style="left:' + (Math.random() * 100) + "%;background:" + cols[i % cols.length] + ";animation-delay:" + (Math.random() * .5).toFixed(2) + "s;animation-duration:" + (1.6 + Math.random() * 1.4).toFixed(2) + "s;--r:" + Math.round(Math.random() * 720 - 360) + "deg;--x:" + Math.round(Math.random() * 160 - 80) + 'px"></i>';
+    box.innerHTML = html; document.body.appendChild(box); setTimeout(function () { box.remove(); }, 3600);
+  }
+  function checkGift() {
+    var t = totals().t, full = t >= GIFT_AT;
+    if (full && !wasGift) { toast("★ ¡Carta sorpresa desbloqueada!"); confetti(); }
+    wasGift = full;
+  }
+
   function message() {
     var t = totals(), who = (store.get("optcg-buyer") || "").trim();
     var lines = t.it.slice().sort(function (a, b) { return b.c.p - a.c.p; }).map(function (x) {
       return "• " + x.n + "× " + x.c.n + " (" + x.c.c + (x.c.v === 2 ? " alt" : "") + ") - " + eur(x.c.p * x.n);
     });
-    return "¡Hola! " + (who ? "Soy " + who + ". " : "") + "Quiero estas cartas de OPTCG Barcelona para recogerlas en mano en Barcelona:\n" + lines.join("\n") +
-      "\n\nTotal: " + eur(t.t) + " (" + t.n + (t.n === 1 ? " carta" : " cartas") + ")\n¿Están disponibles?";
+    return "¡Hola! " + (who ? "Soy " + who + ". " : "") + "Pedido #OB-" + ORDER + " de OPTCG Barcelona, para recoger en mano en Barcelona:\n" + lines.join("\n") +
+      "\n\nTotal: " + eur(t.t) + " (" + t.n + (t.n === 1 ? " carta" : " cartas") + ")" + (t.t >= GIFT_AT ? "\n★ Con carta sorpresa (pedido de " + GIFT_AT + " € o más)" : "") + "\n¿Están disponibles?";
   }
 
   /* ---------------- ventanas ---------------- */
@@ -199,6 +222,29 @@
   }
   var WA_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1Z"/></svg>';
   var cmName = function (c) { return SHOP.cardmarket + "/Offers/Singles?name=" + encodeURIComponent(c.n); };
+  /* ---------------- ticket ---------------- */
+  function ticket(kind) {
+    var t = totals(); if (!t.n) return;
+    var hand = kind === "wa", gift = hand && t.t >= GIFT_AT, who = (store.get("optcg-buyer") || "").trim(), code = ORDER;
+    var d = new Date(), when = d.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" }) + " · " + d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+    var lines = t.it.slice().sort(function (a, b) { return b.c.p - a.c.p; }).map(function (x) {
+      return '<div class="tkt__li"><span>' + x.n + "× " + esc(x.c.n) + " <em>" + x.c.c + "</em></span><span>" + eur(x.c.p * x.n).replace(" €", "") + "</span></div>";
+    }).join("") + (gift ? '<div class="tkt__li tkt__li--gift"><span>★ Carta sorpresa</span><span>0,00</span></div>' : "");
+    var big = hand ? ["Recogida en mano en", "Barcelona", "Te contesto por WhatsApp para quedar"] : ["Envío a casa con", "Cardmarket", "Búscalas en mi tienda G11GAB"];
+    var note = hand ? "Pagas al recoger" + (gift ? " · ★ Carta sorpresa · SORPRESA-" + code : "") : "Pago y envío en Cardmarket · tienda G11GAB";
+    var stamp = hand ? ["Enviado", "por WhatsApp"] : ["A Cardmarket", "G11GAB"];
+    var say = gift ? "¡La carta sorpresa va por mí!" : hand ? "¡Nos vemos en Barcelona!" : "¡Gracias por tu compra!";
+    cart = {}; store.del("optcg-cart"); wasGift = false; ORDER = String(1000 + Math.floor(Math.random() * 9000)); render();
+    showModal("ticket", '<div class="tkt"><div class="tkt__slot"></div><div class="tkt__win"><div class="tkt__paper">' +
+      '<div class="tkt__logo">OPTCG<small>Barcelona</small></div>' +
+      '<p class="tkt__meta">Singles One Piece Card Game<br>Pedido #OB-' + code + (who ? " · " + esc(who) : "") + "<br>" + esc(when) + "</p><hr>" +
+      '<div class="tkt__big"><small>' + big[0] + "</small><strong>" + big[1] + "</strong><small>" + big[2] + "</small></div><hr>" + lines +
+      '<div class="tkt__tot"><span>Total</span><span>' + eur(t.t) + '</span></div><div class="tkt__note">' + esc(note) + '</div><div class="tkt__bars"></div><p class="tkt__code">OB' + code + "</p>" +
+      '<div class="tkt__stamp">' + stamp[0] + "<small>" + stamp[1] + "</small></div></div></div>" +
+      '<p class="tkt__say">' + say + '</p><button type="button" class="tkt__btn" id="tclose">Seguir mirando</button></div>', "Ticket del pedido");
+    if (gift) setTimeout(confetti, 1300);
+  }
+
   function openOrder() {
     var t = totals();
     if (!t.n) { closeModal(); return; }
@@ -209,6 +255,7 @@
           '<div class="shop-lines__r"><b>' + eur(x.c.p * x.n) + "</b>" + qtyHtml(x.c) + "</div></li>";
       }).join("") + "</ul>" +
       '<p class="shop-sum"><span>' + t.n + (t.n === 1 ? " carta" : " cartas") + "</span><b>" + eur(t.t) + "</b></p>" +
+      '<div class="giftbox' + (t.t >= GIFT_AT ? " full" : "") + '"><p class="giftbox__k">★ Carta sorpresa</p><p class="giftbox__h">' + (t.t >= GIFT_AT ? "¡Desbloqueada! Te la llevas con tu pedido en mano." : "Pide " + GIFT_AT + " € o más con recogida en mano y te regalo una carta sorpresa.") + "</p>" + giftHTML(t.t) + "</div>" +
       '<h3 class="shop-choose">¿Cómo lo quieres?</h3>' +
       '<section class="shop-opt" aria-labelledby="opt-hand">' +
         '<p class="shop-opt__tag">Opción 1</p><h4 id="opt-hand">Recogida en mano en Barcelona</h4>' +
@@ -219,9 +266,10 @@
       '<section class="shop-opt" aria-labelledby="opt-cm">' +
         '<p class="shop-opt__tag">Opción 2</p><h4 id="opt-cm">Envío a casa con Cardmarket</h4>' +
         "<p>Compra en mi tienda de Cardmarket, usuario G11GAB. Pago protegido y envío con seguimiento a toda Europa.</p>" +
+        '<p class="shop-cmhint">La carta sorpresa es solo para pedidos con recogida en mano.</p>' +
         '<ul class="shop-cmlist">' + t.it.map(function (x) { return '<li>' + x.n + "× " + esc(x.c.n) + " <span>" + x.c.c + "</span></li>"; }).join("") + "</ul>" +
         '<p class="shop-cmhint">Búscalas por nombre en mi tienda y añádelas a tu carrito de Cardmarket.</p>' +
-        '<a class="shop-cm" href="' + SHOP.cardmarket + '/Offers/Singles" target="_blank" rel="noopener noreferrer">Ir a mi tienda en Cardmarket</a>' +
+        '<a class="shop-cm" id="cmgo" href="' + SHOP.cardmarket + '/Offers/Singles" target="_blank" rel="noopener noreferrer">Ir a mi tienda en Cardmarket</a>' +
       "</section>" +
       '<div class="shop-actions"><button type="button" class="shop-copy" id="copy">Copiar el pedido</button><button type="button" class="shop-clear" id="clear">Vaciar pedido</button></div>' +
       '<pre class="shop-msg" id="msg" hidden></pre></div>', "Tu pedido");
@@ -242,6 +290,8 @@
     else if (el.id === "fbtn") panel($("fpanel").hidden);
     else if (el.id === "fdone") { panel(false, true); var ct = $("grid"); if (ct) window.scrollTo({ top: ct.getBoundingClientRect().top + scrollY - 260, behavior: "smooth" }); }
     else if (el.id === "fx") panel(false);
+    else if (el.id === "wa" || el.id === "cmgo") { var kk = el.id === "wa" ? "wa" : "cm"; setTimeout(function () { ticket(kk); }, 250); }
+    else if (el.id === "tclose") closeModal();
     else if (el.id === "more-btn") { var wasOpen = expanded; expanded = !expanded; render(); if (wasOpen) { var g = $("catalogo"); if (g) g.scrollIntoView({ behavior: "smooth" }); } }
     else if (el.id === "freset" && pend) { pend.set = ""; pend.color = ""; chips(); }
     else if (el.id === "freset2") { state.set = ""; state.color = ""; chips(); render(); }
