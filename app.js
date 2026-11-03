@@ -5,7 +5,7 @@
 
   var SHOP = {
     // Número de WhatsApp con prefijo, sin "+" ni espacios (ej. 34600111222).
-    whatsapp: "34603420373",
+    whatsapp: "34671821655",
     cardmarket: "https://www.cardmarket.com/en/OnePiece/Users/G11GAB"
   };
 
