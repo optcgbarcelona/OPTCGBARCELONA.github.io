@@ -137,7 +137,7 @@
     return "";
   }
   function tile(c) {
-    return '<li class="shop-card"' + (isHot(c) ? " data-hot" : "") + ">" +
+    return '<li class="shop-card"' + (isHot(c) ? " data-hot" : "") + (["SP","SEC","MR","TR"].indexOf(c.r) >= 0 || c.v === 2 ? " data-rare" : "") + ">" +
       '<button type="button" class="shop-thumb" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n + " " + c.c) + '">' +
       tag(c) + '<span class="shop-rar">' + (RAR[c.r] || c.r) + "</span>" +
       '<img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '" loading="lazy" decoding="async" width="300" height="419"></button>' +
@@ -184,6 +184,7 @@
     $("dock-n").textContent = t.n; $("dock-t").textContent = eur(t.t);
     var dg = $("dock-gift"); if (dg) dg.innerHTML = giftHTML(t.t, true);
     $("navbag").hidden = !t.n; $("navbag-n").textContent = t.n;
+    var tn = $("tab-n"); if (tn) { tn.hidden = !t.n; tn.textContent = t.n; $("tab-t").textContent = t.n ? eur(t.t) : "Pedido"; }
   }
   /* ---------------- carta sorpresa (regalo) ---------------- */
   var SLEEVE_AT = 30, GIFT_AT = 50, wasGift = 0;
@@ -226,16 +227,27 @@
     updateDock();
   }
   function closeModal() {
+    if (modalKind === "zoom") { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} }
     $("modal").hidden = true; modalKind = ""; updateDock();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   function openZoom(key) {
     var c = BYKEY[key]; if (!c) return; zoomKey = key;
-    showModal("zoom", '<div class="shop-zoom"><img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '"><div>' +
-      '<h3 class="shop-zoom__name">' + esc(c.n) + "</h3>" +
-      '<p class="shop-sub">' + dots(c) + c.c + (c.v === 2 ? " · arte alternativo" : "") + " · " + (RARN[c.r] || c.r) + " · " + (TYPES[c.t] || c.t) + "</p>" +
-      '<p class="shop-sub">' + esc(c.set) + " · Inglés · Near Mint · " + c.q + (c.q === 1 ? " disponible" : " disponibles") + "</p>" +
-      '<div class="shop-buy"><p class="shop-price shop-price--big">' + eur(c.p) + "</p>" + qtyHtml(c) + "</div></div></div>", c.n);
+    var pre = c.c.split("-")[0];
+    var more = CARDS.filter(function (x) { return x !== c && x.c.split("-")[0] === pre; }).sort(function (a, b) { return b.p - a.p; }).slice(0, 6);
+    var last = c.q === 1 ? '<span class="pz__last">Última unidad</span>' : c.q <= 3 ? '<span class="pz__last">Quedan ' + c.q + "</span>" : '<span class="pz__ok">' + c.q + " disponibles</span>";
+    showModal("zoom", '<div class="pz"><div class="pz__art" id="pz-art"><img src="' + c.img + '" alt="' + esc(c.n + " " + c.c) + '"><i class="pz__holo"></i></div>' +
+      '<div class="pz__info"><p class="pz__k">' + c.c + " · " + (RARN[c.r] || c.r) + (c.v === 2 ? " · Alt art" : "") + "</p>" +
+      '<h3 class="pz__name">' + esc(c.n) + "</h3>" +
+      '<p class="pz__meta">' + dots(c) + esc(c.set) + " · Inglés · Near Mint</p>" +
+      '<div class="pz__buy"><b class="pz__price">' + eur(c.p) + "</b>" + last + "</div>" +
+      '<div class="pz__act">' + qtyHtml(c) + '<button type="button" class="pz__share" id="pz-share" data-k="' + esc(keyOf(c)) + '">Compartir</button></div></div>' +
+      (more.length ? '<div class="pz__more"><p>Otras cartas de ' + pre + '</p><div class="pz__row">' + more.map(function (x) { return '<button type="button" data-zoom="' + esc(keyOf(x)) + '"><img src="' + x.img + '" alt="' + esc(x.n) + '"><b>' + eur(x.p) + "</b></button>"; }).join("") + "</div></div>" : "") +
+      "</div>", c.n);
+    try { history.replaceState(null, "", "#c-" + c.c + (c.v === 2 ? "-p" : "")); } catch (e) {}
+    var art = $("pz-art");
+    if (art) art.addEventListener("pointermove", function (e) { var r = art.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; art.style.setProperty("--rx", (y * -16).toFixed(1) + "deg"); art.style.setProperty("--ry", (x * 18).toFixed(1) + "deg"); art.style.setProperty("--hx", ((x + .5) * 100).toFixed(0) + "%"); });
+    if (art) art.addEventListener("pointerleave", function () { art.style.setProperty("--rx", "0deg"); art.style.setProperty("--ry", "0deg"); });
   }
   var WA_ICON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.1 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1Z"/></svg>';
   var cmName = function (c) { return SHOP.cardmarket + "/Offers/Singles?name=" + encodeURIComponent(c.n); };
@@ -309,6 +321,15 @@
     else if (el.id === "fx") panel(false);
     else if (el.id === "wa" || el.id === "cmgo") { var kk = el.id === "wa" ? "wa" : "cm"; setTimeout(function () { ticket(kk); }, 250); }
     else if (el.id === "tclose") closeModal();
+    else if (el.id === "pz-share") {
+      var c = BYKEY[el.getAttribute("data-k")], url = location.origin + location.pathname + "#c-" + c.c + (c.v === 2 ? "-p" : "");
+      var txt = c.n + " (" + c.c + ") · " + eur(c.p) + " · " + url;
+      if (navigator.share) navigator.share({ title: c.n, text: c.n + " · " + eur(c.p), url: url }).catch(function () {});
+      else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { toast("Enlace copiado"); }, function () { toast(url); });
+    }
+    else if (d.tab === "buscar") { scrollTo({ top: 0, behavior: "smooth" }); setTimeout(function () { $("hq").focus(); }, 350); }
+    else if (d.tab === "sets") { var s = $("colecciones"); if (s) s.scrollIntoView({ behavior: "smooth" }); }
+    else if (d.tab === "pedido") { if (totals().n) openOrder(); else toast("Tu pedido está vacío"); }
     else if (el.id === "more-btn") { var wasOpen = expanded; expanded = !expanded; render(); if (wasOpen) { var g = $("catalogo"); if (g) g.scrollIntoView({ behavior: "smooth" }); } }
     else if (el.id === "freset" && pend) { pend.set = ""; pend.color = ""; chips(); }
     else if (el.id === "freset2") { state.set = ""; state.color = ""; chips(); render(); }
@@ -443,6 +464,13 @@
   document.addEventListener("click", function (e) { var el = e.target.closest("[data-news]"); if (el) openNews(el.getAttribute("data-news")); });
   fetch("news.json?v=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { NEWS = d; if (CARDS.length) renderNews(); }).catch(function () {});
 
+  /* ---------------- vídeo solo cuando se ve ---------------- */
+  (function () {
+    var v = document.querySelector(".how__video video"); if (!v || !("IntersectionObserver" in window)) return;
+    v.removeAttribute("autoplay"); v.pause();
+    new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { v.play().catch(function () {}); } else v.pause(); }); }, { threshold: .35 }).observe(v);
+  })();
+
   /* ---------------- buscador de arriba ---------------- */
   function hqMatches(s) {
     s = s.trim().toLowerCase(); if (!s) return [];
@@ -488,7 +516,7 @@
     var wall = byPrice.slice(0, 18).map(function (c, i) {
       return '<button type="button" class="wall-card" data-zoom="' + esc(keyOf(c)) + '" aria-label="Ver ' + esc(c.n) + '" style="--r:' + ((i % 5) - 2) * 1.6 + 'deg"><img src="' + c.img + '" alt="" loading="lazy" decoding="async" width="300" height="419"></button>';
     }).join("");
-    $("wall").innerHTML = wall + wall.replace(/<button /g, '<button tabindex="-1" aria-hidden="true" ');
+    if ($("wall")) $("wall").innerHTML = wall + wall.replace(/<button /g, '<button tabindex="-1" aria-hidden="true" ');
   }
 
   var io = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
@@ -538,6 +566,7 @@
     $("top-grid").innerHTML = byPrice.slice(0, 4).map(tile).join("");
     motion(byPrice, last);
     sets(byPrice); packOpen(byPrice); renderNews();
+    var m = location.hash.match(/^#c-([A-Z0-9]+-\d+)(-p)?$/); if (m) { var kk = m[1] + "#" + (m[2] ? 2 : 1); if (BYKEY[kk]) openZoom(kk); }
     $("lede").textContent = CARDS.length + " cartas · " + copies.toLocaleString("es-ES") + " copias. Inglés y Near Mint.";
     $("updated").textContent = "Actualizado: " + UPDATED;
     $("foot").innerHTML = "Precios en euros, actualizados el " + esc(UPDATED) + ". Todas en inglés y Near Mint. También en <a href=\"" + SHOP.cardmarket + "\" target=\"_blank\" rel=\"noopener noreferrer\">Cardmarket</a> (G11GAB).";

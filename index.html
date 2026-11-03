@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="theme-black">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -19,6 +19,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&display=swap">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <header class="top-nav">
@@ -63,6 +64,23 @@
     <div class="hero__fan" id="hero-fan" aria-label="Cartas destacadas"></div>
   </section>
 
+  <section class="band" id="buscadas" aria-labelledby="top-title">
+    <div class="wrap">
+      <header class="sec-head">
+        <h2 id="top-title" class="sec-title"><span class="red-dash"></span>Los más buscados</h2>
+        <a class="sec-link" href="#catalogo">Ver todas →</a>
+      </header>
+      <ul class="shop-grid shop-grid--top" id="top-grid"></ul>
+    </div>
+  </section>
+
+
+  <div class="xband" aria-hidden="true">
+    <div class="ticker ticker--black"><div class="ticker__track" id="ticker-b"></div></div>
+    <div class="ticker ticker--red"><div class="ticker__track" id="ticker-a"></div></div>
+  </div>
+
+
   <section class="howvid" id="video" aria-labelledby="vid-title">
     <div class="wrap howvid__in">
       <header class="howvid__head">
@@ -70,18 +88,11 @@
         <p>En 30 segundos. Sin registrarte.</p>
         <a class="sec-link" href="#como">Los 3 pasos →</a>
       </header>
-      <figure class="how__video"><video src="assets/tutorial/como-comprar.mp4" poster="assets/tutorial/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Vídeo: cómo comprar en 3 pasos"></video></figure>
+      <figure class="how__video"><video src="assets/tutorial/como-comprar.mp4" poster="assets/tutorial/poster.jpg" muted loop playsinline preload="none" aria-label="Vídeo: cómo comprar en 3 pasos"></video></figure>
     </div>
   </section>
 
-  <div class="xband" aria-hidden="true">
-    <div class="ticker ticker--black"><div class="ticker__track" id="ticker-b"></div></div>
-    <div class="ticker ticker--red"><div class="ticker__track" id="ticker-a"></div></div>
-  </div>
 
-  <div class="wall" aria-label="Algunas cartas del drop">
-    <div class="wall__track" id="wall"></div>
-  </div>
 
   <section class="sets" id="colecciones" aria-labelledby="sets-title">
     <div class="wrap">
@@ -90,16 +101,6 @@
         <a class="sec-link" href="#catalogo">Ver todas →</a>
       </header>
       <div class="set-row" id="set-row"></div>
-    </div>
-  </section>
-
-  <section class="band" id="buscadas" aria-labelledby="top-title">
-    <div class="wrap">
-      <header class="sec-head">
-        <h2 id="top-title" class="sec-title"><span class="red-dash"></span>Los más buscados</h2>
-        <a class="sec-link" href="#catalogo">Ver todas →</a>
-      </header>
-      <ul class="shop-grid shop-grid--top" id="top-grid"></ul>
     </div>
   </section>
 
@@ -170,6 +171,12 @@
   </section>
   <div class="wrap"><footer class="shop-foot shop-foot--end" id="foot"></footer></div>
 </main>
+
+<nav class="tabbar" aria-label="Accesos rápidos">
+  <button type="button" data-tab="buscar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.5-4.5"/></svg><span>Buscar</span></button>
+  <button type="button" data-tab="sets"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="4" y="3" width="11" height="15" rx="2"/><path d="M9 21h9a2 2 0 0 0 2-2V7"/></svg><span>Colecciones</span></button>
+  <button type="button" data-tab="pedido" class="tabbar__ped"><span class="tabbar__n" id="tab-n" hidden>0</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span id="tab-t">Pedido</span></button>
+</nav>
 
 <div class="shop-dock" id="dock" hidden>
   <button type="button" id="dock-btn"><span class="shop-dock__n" id="dock-n">0</span><span>Ver pedido</span><span class="shop-dock__g" id="dock-gift"></span><span class="shop-dock__t" id="dock-t">0,00 €</span></button>
