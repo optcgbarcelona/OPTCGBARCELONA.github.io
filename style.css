@@ -370,7 +370,16 @@ body :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 .giftbox.full { background:var(--ink); color:#fff; }
 .gift { display:block; }
 .gift__row { display:flex; align-items:center; gap:12px; }
-.gift__track { flex:1; height:16px; border-radius:99px; background:var(--bg); overflow:hidden; box-shadow:inset 0 0 0 2px var(--ink); }
+.gift__track { position:relative; flex:1; height:16px; border-radius:99px; background:var(--bg); box-shadow:inset 0 0 0 2px var(--ink); }
+.gift__fill { position:absolute; left:0; top:0; }
+.gift__mark { position:absolute; top:-5px; bottom:-5px; width:0; }
+.gift__mark i { position:absolute; left:-2px; top:0; bottom:0; width:4px; border-radius:2px; background:var(--ink); }
+.gift.lv1 .gift__mark i { background:var(--red); box-shadow:0 0 0 2px #fff; }
+.gift__mark em { position:absolute; top:calc(100% + 3px); left:50%; transform:translateX(-50%); font:800 9px var(--f); font-style:normal; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; color:var(--muted); }
+.gift.lv1 .gift__mark em { color:var(--red); }
+.giftbox.full .gift__mark i { background:#fff; } .giftbox.full .gift__mark em { color:#fff; }
+.gift:not(.gift--sm) .gift__txt { margin-top:22px; }
+.gift--sm .gift__mark { top:-3px; bottom:-3px; } .gift--sm .gift__mark i { width:3px; left:-1px; background:#fff; }
 .giftbox.full .gift__track { background:#222; box-shadow:inset 0 0 0 2px #fff; }
 .gift__fill { display:block; height:100%; border-radius:99px; background:repeating-linear-gradient(-45deg, var(--red) 0 8px, #ff5a4d 8px 16px); background-size:22px 22px; animation:stripes 1s linear infinite; transition:width .7s cubic-bezier(.2,.9,.3,1.15); }
 @keyframes stripes { to { background-position:22px 0; } }
@@ -436,6 +445,9 @@ body :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 .shop { padding-bottom:70px; }
 
 /* ---------- cómo comprar: vídeo ---------- */
+.how { padding:56px 0 64px; }
+.shop-foot--end { margin:0; padding:10px 0 60px; color:var(--muted); }
+.shop-foot--end a { color:inherit; }
 .how__grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,480px); gap:48px; align-items:center; }
 .how__grid .how__list { grid-template-columns:1fr; gap:22px; }
 .how__video { margin:0; border-radius:26px; outline:1px solid rgba(255,255,255,.14); overflow:hidden; background:#000; box-shadow:0 40px 80px -30px rgba(0,0,0,.8); aspect-ratio:1; }
